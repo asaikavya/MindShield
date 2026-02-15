@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MindShield.Core/MindShield.Core.csproj" />
+  <Project Path="MindShield.Web/MindShield.Web.csproj" />
+</Solution>

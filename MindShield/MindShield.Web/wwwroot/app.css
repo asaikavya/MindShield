@@ -1,0 +1,168 @@
+/* Update your body to be a clean slate */
+body {
+    background: #1a1a2e !important;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden; /* This stops the flickering scrollbar */
+}
+
+/* Force the main container to center the Glass Panel */
+.main-container {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+}
+
+/* Ensure the glass panel is ready for centering */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    padding: 2.5rem;
+    width: 600px;
+    max-width: 90%;
+    text-align: center;
+    /* Ensure it is visible and centered */
+    display: block;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* HEADERS */
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #00d2ff; /* Solid Neon Blue */
+    text-shadow: 0 0 15px rgba(0, 210, 255, 0.6); /* The Cyberpunk Glow */
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: none !important; /* Forces the blue background box to die */
+    border: none !important; /* Removes any accidental borders */
+    outline: none !important; /* Removes the browser's focus ring */
+    box-shadow: none !important; /* Removes any default shadow boxes */
+    /* This prevents the "jumping" effect during load */
+    display: inline-block;
+    margin: 0 auto 0.5rem auto;
+}
+
+.subtitle {
+    color: #a0a0a0;
+    margin-bottom: 2rem;
+}
+
+/* TEXT AREA */
+textarea {
+    width: 100%;
+    height: 150px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #fff;
+    padding: 1rem;
+    font-size: 1.1rem;
+    resize: none;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+    textarea:focus {
+        background: rgba(0, 0, 0, 0.4);
+        border-color: #00d2ff;
+    }
+
+/* BUTTONS */
+.btn-primary {
+    background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+}
+
+    .btn-primary:hover {
+        transform: scale(1.05);
+    }
+
+/* ALERTS & POPUPS */
+.alert-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 10px;
+    font-weight: 500;
+    animation: slideIn 0.5s ease;
+}
+
+.alert-safe {
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+}
+.alert-danger {
+    /* Cooler Gradient Red */
+    background: linear-gradient(90deg, rgba(220, 53, 69, 0.2) 0%, rgba(255, 107, 107, 0.2) 100%);
+    border: 1px solid #ff6b6b;
+    color: #ffffff; /* White text is easier to read */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5); /* Slight shadow for readability */
+}
+
+.alert-warning {
+    /* Cooler Gradient Yellow */
+    background: linear-gradient(90deg, rgba(241, 196, 15, 0.2) 0%, rgba(243, 156, 18, 0.2) 100%);
+    border: 1px solid #f1c40f;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* THE "GUARDIAN NOTIFIED" POPUP */
+.guardian-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideInRight 0.5s ease;
+    z-index: 1000;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

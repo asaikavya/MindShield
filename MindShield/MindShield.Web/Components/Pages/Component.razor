@@ -1,0 +1,84 @@
+﻿@page "/"
+@using MindShield.Web
+@using MindShield.Core
+@using Microsoft.EntityFrameworkCore
+@inject MindShieldDbContext DbContext
+@inject ISafetyService SafetyService
+@rendermode InteractiveServer
+
+<div class="glass-panel">
+    <h1>MindShield</h1>
+    <p class="subtitle">
+        Protecting: <strong>@(currentUser?.FullName ?? "Loading...")</strong>
+    </p>
+
+    <textarea @bind="postContent" placeholder="What's on your mind?"></textarea>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">@postContent.Length characters</span>
+        <button class="btn-primary" @onclick="AnalyzePost">Check Safety</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(analysisResult))
+    {
+        <div class="alert-box @alertClass">
+            @analysisResult
+        </div>
+    }
+</div>
+
+@if (showGuardianPopup)
+{
+    <div class="guardian-toast">
+        <span style="font-size: 1.5rem;">🔒</span>
+        <div>
+            <strong>Guardian Notified</strong><br />
+            <small>Sent secure alert to Sarah (Wife)</small>
+        </div>
+    </div>
+}
+
+@code {
+    private RealityProfile? currentUser;
+    private string postContent = "";
+    private string analysisResult = "";
+    private string alertClass = "";
+    private bool showGuardianPopup = false; // Controls the popup
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await DbContext.RealityProfiles.FirstOrDefaultAsync();
+    }
+
+    private async Task AnalyzePost()
+    {
+        if (currentUser == null) return;
+
+        // 1. Get the Analysis
+        analysisResult = await SafetyService.AnalyzeAsync(postContent, currentUser);
+
+        // 2. Decide the Color & Popup based on the result
+        if (analysisResult.Contains("Approved") || analysisResult.Contains("SAFE"))
+        {
+            alertClass = "alert-safe";
+            showGuardianPopup = false;
+        }
+        else if (analysisResult.Contains("Drafts") || analysisResult.Contains("Manic"))
+        {
+            // MANIC/DANGER -> Red + Popup
+            alertClass = "alert-danger";
+            showGuardianPopup = true;
+
+            // Auto-hide popup after 3 seconds
+            _ = Task.Delay(3000).ContinueWith(_ => { showGuardianPopup = false; InvokeAsync(StateHasChanged); });
+        }
+        else
+        {
+            // WARNING/REVIEW -> Yellow + Popup
+            alertClass = "alert-warning";
+            showGuardianPopup = true;
+
+            _ = Task.Delay(3000).ContinueWith(_ => { showGuardianPopup = false; InvokeAsync(StateHasChanged); });
+        }
+    }
+}
