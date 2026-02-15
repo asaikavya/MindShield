@@ -131,16 +131,17 @@ textarea {
     position: fixed;
     top: 20px;
     right: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #333;
+    background: #ffffff; /* Solid white to ensure visibility */
+    color: #333; /* Dark text */
     padding: 15px 25px;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-left: 5px solid #ff6b6b; /* Red accent on the left */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Strong shadow */
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     animation: slideInRight 0.5s ease;
-    z-index: 1000;
+    z-index: 9999 !important; /* FORCE IT TO THE TOP */
 }
 
 @keyframes slideIn {
@@ -164,5 +165,42 @@ textarea {
     to {
         opacity: 1;
         transform: translateX(0);
+    }
+}
+
+/* Success / Post Button */
+.btn-success {
+    background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px; /* Space it out from the Check button */
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    transition: transform 0.2s;
+    animation: popIn 0.3s ease-out; /* Makes it pop in nicely */
+}
+
+    .btn-success:hover {
+        transform: scale(1.05);
+        background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
+    }
+
+/* Animation for the button appearing */
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
     }
 }

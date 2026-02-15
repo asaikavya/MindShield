@@ -14,9 +14,17 @@
 
     <textarea @bind="postContent" placeholder="What's on your mind?"></textarea>
 
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
         <span style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">@postContent.Length characters</span>
-        <button class="btn-primary" @onclick="AnalyzePost">Check Safety</button>
+
+        <div>
+            <button class="btn-primary" @onclick="AnalyzePost">Check Safety</button>
+
+            @if (canPost)
+            {
+                <button class="btn-success" @onclick="SimulatePost">🚀 Post to LinkedIn</button>
+            }
+        </div>
     </div>
 
     @if (!string.IsNullOrEmpty(analysisResult))
@@ -43,7 +51,8 @@
     private string postContent = "";
     private string analysisResult = "";
     private string alertClass = "";
-    private bool showGuardianPopup = false; // Controls the popup
+    private bool showGuardianPopup = false;
+    private bool canPost = false; // Controls the Green Button
 
     protected override async Task OnInitializedAsync()
     {
@@ -54,31 +63,79 @@
     {
         if (currentUser == null) return;
 
-        // 1. Get the Analysis
-        analysisResult = await SafetyService.AnalyzeAsync(postContent, currentUser);
+        // 1. Loading State
+        canPost = false;
+        showGuardianPopup = false;
+        analysisResult = "Analyzing...";
+        StateHasChanged();
 
-        // 2. Decide the Color & Popup based on the result
-        if (analysisResult.Contains("Approved") || analysisResult.Contains("SAFE"))
+        // 2. Get the Analysis from Ollama
+        string rawResult = await SafetyService.AnalyzeAsync(postContent, currentUser);
+        string cleanMessage = rawResult;
+
+        // ---------------------------------------------------------
+        // STRATEGY A: SMART AI PARSING (The "Winning" Code)
+        // ---------------------------------------------------------
+        if (rawResult.Contains("[SAFE]"))
         {
+            // Cut off the "I cannot assess" junk
+            int index = rawResult.IndexOf("[SAFE]");
+            cleanMessage = rawResult.Substring(index + "[SAFE]".Length).Trim();
+
+            // ✅ Success
             alertClass = "alert-safe";
             showGuardianPopup = false;
+            canPost = true; // Green Button
+            analysisResult = cleanMessage;
         }
-        else if (analysisResult.Contains("Drafts") || analysisResult.Contains("Manic"))
+        else if (rawResult.Contains("[DANGER]"))
         {
-            // MANIC/DANGER -> Red + Popup
+            int index = rawResult.IndexOf("[DANGER]");
+            cleanMessage = rawResult.Substring(index + "[DANGER]".Length).Trim();
+
+            // 🚨 Danger
             alertClass = "alert-danger";
             showGuardianPopup = true;
-
-            // Auto-hide popup after 3 seconds
-            _ = Task.Delay(3000).ContinueWith(_ => { showGuardianPopup = false; InvokeAsync(StateHasChanged); });
+            canPost = false;
+            analysisResult = cleanMessage;
         }
+        // ---------------------------------------------------------
+        // STRATEGY B: EMERGENCY BACKUP (If AI forgets the tag)
+        // ---------------------------------------------------------
         else
         {
-            // WARNING/REVIEW -> Yellow + Popup
-            alertClass = "alert-warning";
-            showGuardianPopup = true;
+            // If the AI gave a weird answer without a tag, we check keywords manually
+            // so the demo doesn't break.
+            string lowerRaw = rawResult.ToLower();
 
-            _ = Task.Delay(3000).ContinueWith(_ => { showGuardianPopup = false; InvokeAsync(StateHasChanged); });
+            if (lowerRaw.Contains("safe") || lowerRaw.Contains("good") || lowerRaw.Contains("great"))
+            {
+                // Force Green
+                alertClass = "alert-safe";
+                canPost = true;
+                analysisResult = rawResult;
+            }
+            else
+            {
+                // Default to Warning
+                alertClass = "alert-warning";
+                showGuardianPopup = true;
+                canPost = false;
+                analysisResult = rawResult;
+            }
         }
+
+        StateHasChanged();
+    }
+
+    private void SimulatePost()
+    {
+        // 1. Show Success Message
+        analysisResult = "✅ Successfully posted to LinkedIn!";
+        alertClass = "alert-safe";
+
+        // 2. Clear the input
+        postContent = "";
+        canPost = false;
     }
 }
