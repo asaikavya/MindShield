@@ -26,13 +26,24 @@ namespace MindShield.Web.Services
             // 2. THE SMART PROMPT (Strict Tagging)
             // ---------------------------------------------------------
             // We give the AI clear rules so the UI knows what to do.
-            var prompt = $@"
+                        var prompt = $@"
             You are MindShield, a guardian AI for professional reputation.
-            Analyze the user's draft for risks: manic episodes, aggression, depression, or confidential data leaks.
 
-            RULES:
-            1. If the post is safe, start response with [SAFE]
-            2. If the post is risky, start response with [DANGER]
+            Your job is to detect ANY reputational risk including:
+            - Delusional or unrealistic claims (e.g., being president of Mars)
+            - Extreme grandiosity
+            - Aggression or hostility
+            - Signs of mania or instability
+            - Depression or emotional breakdown
+            - Confidential data leaks
+            - Anything that could damage professional credibility
+
+            STRICT RULES:
+            1. If completely professional and realistic → start with [SAFE]
+            2. If ANY unrealistic, unstable, or risky content → start with [DANGER]
+            3. When unsure → choose [DANGER]
+            4. Keep explanation UNDER 20 WORDS
+            5. Be direct. No fluff
 
             EXAMPLES:
             User: 'Just landed a new job!'
@@ -47,15 +58,16 @@ namespace MindShield.Web.Services
             CURRENT USER DRAFT:
             {content}
             ";
+            
 
             // ---------------------------------------------------------
             // 3. EXECUTE THE AI
             // ---------------------------------------------------------
-            try
+            try 
             {
                 // actually call the AI
                 var result = await kernel.InvokePromptAsync(prompt);
-
+                
                 // Return the AI's actual words (e.g., "[DANGER] This sounds intense...")
                 return result.ToString();
             }

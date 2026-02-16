@@ -17,8 +17,10 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
         <span style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">@postContent.Length characters</span>
 
-        <div>
-            <button class="btn-primary" @onclick="AnalyzePost">Check Safety</button>
+        <div style="gap: 10px; display: flex;">
+            <button class="btn-primary" @onclick="AnalyzePost" disabled="@isScanning">
+                @(isScanning ? "Scanning..." : "Check Safety")
+            </button>
 
             @if (canPost)
             {
@@ -27,7 +29,16 @@
         </div>
     </div>
 
-    @if (!string.IsNullOrEmpty(analysisResult))
+    @* --- NEW: PULSING ANALYZING STATE --- *@
+    @if (isScanning)
+    {
+        <div class="analyzing-state">
+            <div class="pulse-dot"></div>
+            <span>AI is scanning your draft...</span>
+        </div>
+    }
+    @* --- EXISTING: RESULT BOX --- *@
+    else if (!string.IsNullOrEmpty(analysisResult))
     {
         <div class="alert-box @alertClass">
             @analysisResult
@@ -54,33 +65,58 @@
     private bool showGuardianPopup = false;
     private bool canPost = false; // Controls the Green Button
 
+    // NEW: Controls the animation state
+    private bool isScanning = false;
+
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await DbContext.RealityProfiles.FirstOrDefaultAsync();
+        // Load the user profile (simulated for now)
+        // Ensure you have a DbContext properly registered or mock this data
+        try
+        {
+            currentUser = await DbContext.RealityProfiles.FirstOrDefaultAsync();
+        }
+        catch
+        {
+            // Fallback if DB isn't ready during dev
+            currentUser = new RealityProfile { FullName = "Alex Rivera" };
+        }
     }
 
     private async Task AnalyzePost()
     {
         if (currentUser == null) return;
 
-        // 1. Loading State
-        canPost = false;
-        showGuardianPopup = false;
-        analysisResult = "Analyzing...";
-        StateHasChanged();
+        // 1. START Loading State
+        isScanning = true;            // Turn on animation
+        canPost = false;              // Hide post button
+        showGuardianPopup = false;    // Hide old popups
+        analysisResult = "";          // Clear old text
+        StateHasChanged();            // Refresh UI immediately
 
-        // 2. Get the Analysis from Ollama
+        // 2. Get the Analysis from Ollama (Simulating network delay helps the demo feel real)
         string rawResult = await SafetyService.AnalyzeAsync(postContent, currentUser);
+
+        // 3. STOP Loading State
+        isScanning = false;
+
+        // 4. Process Logic (Your existing Smart Parsing)
         string cleanMessage = rawResult;
 
-        // ---------------------------------------------------------
-        // STRATEGY A: SMART AI PARSING (The "Winning" Code)
-        // ---------------------------------------------------------
         if (rawResult.Contains("[SAFE]"))
         {
             // Cut off the "I cannot assess" junk
             int index = rawResult.IndexOf("[SAFE]");
-            cleanMessage = rawResult.Substring(index + "[SAFE]".Length).Trim();
+            // specific logic to handle if [SAFE] is at the start or middle
+            // simplistic approach: take everything after the tag
+            if (index + 6 < rawResult.Length)
+            {
+                cleanMessage = rawResult.Substring(index + 6).Trim();
+            }
+            else
+            {
+                cleanMessage = "Content looks professional and safe.";
+            }
 
             // ✅ Success
             alertClass = "alert-safe";
@@ -91,7 +127,14 @@
         else if (rawResult.Contains("[DANGER]"))
         {
             int index = rawResult.IndexOf("[DANGER]");
-            cleanMessage = rawResult.Substring(index + "[DANGER]".Length).Trim();
+            if (index + 8 < rawResult.Length)
+            {
+                cleanMessage = rawResult.Substring(index + 8).Trim();
+            }
+            else
+            {
+                cleanMessage = "Risk detected. Please review.";
+            }
 
             // 🚨 Danger
             alertClass = "alert-danger";
@@ -99,25 +142,19 @@
             canPost = false;
             analysisResult = cleanMessage;
         }
-        // ---------------------------------------------------------
-        // STRATEGY B: EMERGENCY BACKUP (If AI forgets the tag)
-        // ---------------------------------------------------------
         else
         {
-            // If the AI gave a weird answer without a tag, we check keywords manually
-            // so the demo doesn't break.
+            // STRATEGY B: EMERGENCY BACKUP
             string lowerRaw = rawResult.ToLower();
 
             if (lowerRaw.Contains("safe") || lowerRaw.Contains("good") || lowerRaw.Contains("great"))
             {
-                // Force Green
                 alertClass = "alert-safe";
                 canPost = true;
                 analysisResult = rawResult;
             }
             else
             {
-                // Default to Warning
                 alertClass = "alert-warning";
                 showGuardianPopup = true;
                 canPost = false;

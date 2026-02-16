@@ -103,6 +103,8 @@ textarea {
     border-radius: 10px;
     font-weight: 500;
     animation: slideIn 0.5s ease;
+    max-height: 120px; /* Limits the height */
+    overflow-y: auto; /* Adds a scrollbar if text is too long */
 }
 
 .alert-safe {
@@ -202,5 +204,47 @@ textarea {
 
     100% {
         transform: scale(1);
+    }
+}
+/* In app.css */
+.analyzing-state {
+    margin-top: 20px;
+    padding: 15px;
+    text-align: center;
+    color: #cbd5e1; /* Light gray text */
+    font-family: 'Segoe UI', sans-serif;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05); /* Faint glass background */
+}
+
+/* Optional: A cool pulsing dot animation */
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #00d4ff; /* Cyan color */
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
     }
 }
