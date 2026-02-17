@@ -41,7 +41,7 @@ flowchart LR
   Services -->|Alerts & Guidance| UI
 ```
 - 
-- ![Architecture Diagram](/Images/mindshield.png)
+
 
 Team
 - Kavya Aakaveeti — .net developer : architecture, Microsoft Foundry integration, and Azure OpenAI orchestration.
