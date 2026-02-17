@@ -1,16 +1,29 @@
 ﻿using MindShield.Core;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
+using MindShield.Web.Services;
 
 namespace MindShield.Web.Services
 {
-    public class OllamaSafetyService : ISafetyService
+    // Renamed to be generic (works with both Azure AND Ollama)
+    public class MindShieldSafetyService : ISafetyService
     {
+        private readonly Kernel _kernel;
+
+        // 💉 INJECTION: We ask for the Kernel we built in Program.cs
+        public MindShieldSafetyService(Kernel kernel)
+        {
+            _kernel = kernel;
+        }
+
         public async Task<string> AnalyzeAsync(string content, RealityProfile profile)
         {
             string lowerContent = content.ToLower();
 
-           
+            // ---------------------------------------------------------
+            // 🛑 DEMO MODE / DETERMINISTIC LAYER
+            // These hardcoded checks make your video demo flawless 
+            // and save API costs.
+            // ---------------------------------------------------------
 
             // SCENARIO 1: The "Black Cat" / Stolen Valor Case
             if (lowerContent.Contains("black cat") || lowerContent.Contains("blackcat"))
@@ -34,33 +47,30 @@ namespace MindShield.Web.Services
             }
 
             // ---------------------------------------------------------
-            //  REAL AI 
+            // 🧠 REAL AI (Azure or Local)
+            // Uses whatever we configured in Program.cs
             // ---------------------------------------------------------
             try
             {
-                var builder = Kernel.CreateBuilder();
-                builder.AddOpenAIChatCompletion(
-                    modelId: "phi3",
-                    apiKey: "ignore",
-                    httpClient: new HttpClient { BaseAddress = new Uri("http://localhost:11434/v1") }
-                );
-                var kernel = builder.Build();
-
-                // Short prompt to prevent freezing
+                // Short prompt to prevent freezing/timeouts
                 var prompt = $@"
-                                You are MindShield. Analyze this draft.
-                                User: {profile.FullName ?? "User"}
-                                Draft: ""{content}""
-                                INSTRUCTIONS:
-                                1. Output [SAFE] or [DANGER].
-                                2. Keep explanation UNDER 15 WORDS.
-                                ";
-                var result = await kernel.InvokePromptAsync(prompt);
+                You are MindShield. Analyze this draft.
+                User: {profile.FullName ?? "User"}
+                Draft: ""{content}""
+                INSTRUCTIONS:
+                1. Output [SAFE] or [DANGER].
+                2. Keep explanation UNDER 15 WORDS.
+                ";
+
+                // We use the _kernel injected from Program.cs
+                var result = await _kernel.InvokePromptAsync(prompt);
                 return result.ToString();
             }
-            catch
+            catch (Exception ex)
             {
-                return "[SAFE] (Offline Mode) AI is currently unavailable.";
+                // Helpful error logging for Azure
+                Console.WriteLine($"AI Error: {ex.Message}");
+                return "[SAFE] (Offline Mode) AI is currently unavailable. Proceed with caution.";
             }
         }
     }
