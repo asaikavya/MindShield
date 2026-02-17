@@ -8,7 +8,7 @@ namespace MindShield.Web.Workers
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<LinkedInGuardianWorker> _logger;
-        private int _scanCount = 0; // We use this to trigger the "Fake Event"
+        
 
         public LinkedInGuardianWorker(IServiceProvider serviceProvider, ILogger<LinkedInGuardianWorker> logger)
         {

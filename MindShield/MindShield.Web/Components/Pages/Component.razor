@@ -12,7 +12,10 @@
         Protecting: <strong>@(currentUser?.FullName ?? "Loading...")</strong>
     </p>
 
-    <textarea @bind="postContent" placeholder="What's on your mind?"></textarea>
+    <textarea @bind="postContent"
+              @oninput="OnContentChanged"
+              placeholder="What's on your mind?">
+</textarea>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
         <span style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">@postContent.Length characters</span>
@@ -38,10 +41,21 @@
         </div>
     }
     @* --- EXISTING: RESULT BOX --- *@
-    else if (!string.IsNullOrEmpty(analysisResult))
+    else if (safetyResult != null)
     {
         <div class="alert-box @alertClass">
-            @analysisResult
+            <strong>@safetyResult.Status</strong><br />
+            <p><b>Reason:</b> @safetyResult.Reason</p>
+
+            @if (!string.IsNullOrWhiteSpace(safetyResult.Rewrite))
+            {
+                <p><b>Suggested Rewrite:</b> @safetyResult.Rewrite</p>
+                <button class="btn-primary" @onclick="ApplyRewrite">
+                    ✏ Use Suggested Rewrite
+                </button>
+            }
+
+            <p><b>Recommended Action:</b> @safetyResult.Action</p>
         </div>
     }
 </div>
@@ -60,25 +74,20 @@
 @code {
     private RealityProfile? currentUser;
     private string postContent = "";
-    private string analysisResult = "";
+    private SafetyResult? safetyResult;
     private string alertClass = "";
     private bool showGuardianPopup = false;
-    private bool canPost = false; // Controls the Green Button
-
-    // NEW: Controls the animation state
+    private bool canPost = false;
     private bool isScanning = false;
 
     protected override async Task OnInitializedAsync()
     {
-        // Load the user profile (simulated for now)
-        // Ensure you have a DbContext properly registered or mock this data
         try
         {
             currentUser = await DbContext.RealityProfiles.FirstOrDefaultAsync();
         }
         catch
         {
-            // Fallback if DB isn't ready during dev
             currentUser = new RealityProfile { FullName = "Alex Rivera" };
         }
     }
@@ -87,92 +96,81 @@
     {
         if (currentUser == null) return;
 
-        // 1. START Loading State
-        isScanning = true;            // Turn on animation
-        canPost = false;              // Hide post button
-        showGuardianPopup = false;    // Hide old popups
-        analysisResult = "";          // Clear old text
-        StateHasChanged();            // Refresh UI immediately
+        isScanning = true;
+        canPost = false;
+        showGuardianPopup = false;
+        safetyResult = null;
+        StateHasChanged();
 
-        // 2. Get the Analysis from Ollama (Simulating network delay helps the demo feel real)
-        string rawResult = await SafetyService.AnalyzeAsync(postContent, currentUser);
+        safetyResult = await SafetyService.AnalyzeAsync(postContent, currentUser);
 
-        // 3. STOP Loading State
         isScanning = false;
 
-        // 4. Process Logic (Your existing Smart Parsing)
-        string cleanMessage = rawResult;
-
-        if (rawResult.Contains("[SAFE]"))
+        // LOGIC: Decide based on RiskLevel
+        if (safetyResult.Status == "SAFE")
         {
-            // Cut off the "I cannot assess" junk
-            int index = rawResult.IndexOf("[SAFE]");
-            // specific logic to handle if [SAFE] is at the start or middle
-            // simplistic approach: take everything after the tag
-            if (index + 6 < rawResult.Length)
-            {
-                cleanMessage = rawResult.Substring(index + 6).Trim();
-            }
-            else
-            {
-                cleanMessage = "Content looks professional and safe.";
-            }
-
-            // ✅ Success
             alertClass = "alert-safe";
-            showGuardianPopup = false;
-            canPost = true; // Green Button
-            analysisResult = cleanMessage;
-        }
-        else if (rawResult.Contains("[DANGER]"))
-        {
-            int index = rawResult.IndexOf("[DANGER]");
-            if (index + 8 < rawResult.Length)
-            {
-                cleanMessage = rawResult.Substring(index + 8).Trim();
-            }
-            else
-            {
-                cleanMessage = "Risk detected. Please review.";
-            }
-
-            // 🚨 Danger
-            alertClass = "alert-danger";
-            showGuardianPopup = true;
-            canPost = false;
-            analysisResult = cleanMessage;
+            canPost = true;
         }
         else
         {
-            // STRATEGY B: EMERGENCY BACKUP
-            string lowerRaw = rawResult.ToLower();
+            canPost = false;
 
-            if (lowerRaw.Contains("safe") || lowerRaw.Contains("good") || lowerRaw.Contains("great"))
+            // 1. Color the box based on severity
+            alertClass = (safetyResult.RiskLevel?.Equals("Severe", StringComparison.OrdinalIgnoreCase) == true)
+             ? "alert-danger"
+             : "alert-warning";
+
+            // 2. TRIGGER GUARDIAN
+            // We check if it is DANGER *OR* if RiskLevel is Severe
+            if (safetyResult.Status == "DANGER" ||
+                safetyResult.RiskLevel?.Equals("Severe", StringComparison.OrdinalIgnoreCase) == true)
             {
-                alertClass = "alert-safe";
-                canPost = true;
-                analysisResult = rawResult;
+                showGuardianPopup = true;
             }
             else
             {
-                alertClass = "alert-warning";
-                showGuardianPopup = true;
-                canPost = false;
-                analysisResult = rawResult;
+                showGuardianPopup = false;
             }
         }
 
         StateHasChanged();
-    }
+    } // <--- This closes AnalyzePost properly
 
     private void SimulatePost()
     {
-        // 1. Show Success Message
-        analysisResult = "✅ Successfully posted to LinkedIn!";
+        if (safetyResult?.Status != "SAFE")
+            return;
+
         alertClass = "alert-safe";
 
-        // 2. Clear the input
+        safetyResult = new SafetyResult
+        {
+            Status = "SAFE",
+            Reason = "Successfully posted to LinkedIn!",
+            Rewrite = "",
+            Action = "Post completed."
+        };
+
         postContent = "";
         canPost = false;
+    }
+
+    private void ApplyRewrite()
+    {
+        if (safetyResult != null && !string.IsNullOrWhiteSpace(safetyResult.Rewrite))
+        {
+            postContent = safetyResult.Rewrite;
+            safetyResult = null;
+            canPost = false;
+            alertClass = "";
+        }
+    }
+
+    private void OnContentChanged(ChangeEventArgs e)
+    {
+        safetyResult = null;
+        canPost = false;
+        alertClass = "";
     }
 }
