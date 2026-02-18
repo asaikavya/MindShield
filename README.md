@@ -1,49 +1,41 @@
-# MindShield
+# MindShield: Professional Reputation Guardian
 
-MindShield is a Blazor-based professional reputation guardian built as a 
-- hackathon proof‑of‑concept. It inspects user-generated content and external signals to 
-- detect social engineering or reputation risks, explains why content is risky,
-- and recommends safer rewrites and mitigation actions.
+MindShield is an AI-driven safety net for social media, built for the **Microsoft Innovation Studio Hackathon**. It acts as an intelligent "pause button" to ensure your digital footprint always reflects your best professional self.
 
-- ## Core capabilities
+## 🚀 Key Features
 
-- AI Sentiment Check: Powered by Azure OpenAI (via Microsoft Foundry) with an optional local fallback to Ollama.
-- Real-time content analysis and classification using Azure OpenAI (configured via `AzureOpenAI` in `appsettings.json`).
-- Policy-driven scoring and orchestration using Microsoft Foundry pipelines.
-- Persistent storage for events, alerts, and telemetry using Entity Framework Core (`MindShieldDbContext`).
-- Background workers that continuously scan feeds and raise alerts (for example, `Workers/LinkedInGuardianWorker.cs`).
-- Interactive Blazor UI for inspection, feedback, and mitigation guidance.
+* **Tiered Risk Analysis:** Uses **Microsoft Semantic Kernel** to categorize draft content into three distinct levels:
+    * **Safe:** Professional or harmless casual updates.
+    * **Moderate:** Unprofessional, aggressive, or "cringe" content.
+    * **Severe:** Dangerous, delusional, or high-risk identity claims (e.g., impersonation).
+* **Smart Intervention Logic:**
+    * **For Moderate Risk:** The AI suggests a polite, professional **Rewrite** to fix the tone while keeping the user's intent.
+    * **For Severe Risk:** The system **BLOCKS** the post entirely and triggers a **Guardian Notification** to a trusted contact (e.g., family member or mentor).
+* **Hybrid AI Architecture:** Powered by **Azure AI Foundry (GPT-4o)** for primary high-fidelity analysis, with an optional **Ollama (Phi-3)** fallback for privacy-first offline usage.
+* **Modern Dashboard:** A high-performance **Blazor Interactive Server** UI featuring Glassmorphism design and real-time scanning states.
 
-Architecture
+## 🏗️ Architecture
 
-The application hosts a Blazor front-end and an application service layer in the same process.
-Services call Microsoft Foundry pipelines that orchestrate Azure OpenAI model invocations and deterministic rules. 
-Outcomes are stored in the SQL database and surfaced in the UI.
-
-Mermaid diagram
-
+The application hosts a Blazor front-end and an application service layer in the same process. Services call **Microsoft Foundry pipelines** that orchestrate Azure OpenAI model invocations and deterministic rules. Outcomes are stored in a SQL database and surfaced in the UI.
 
 ```mermaid
 flowchart LR
-  User[User (Browser)] -->|Interacts| UI[`MindShield.Web` (Blazor UI)]
-  UI -->|API / SignalR| Services[Application Services]
-  Services --> Foundry[Microsoft Foundry Pipelines]
-  Services --> OpenAI[Azure OpenAI (configured deployment)]
-  Services --> DB[`MindShieldDbContext` (EF Core / SQL Server LocalDB)]
-  Foundry --> OpenAI
-  OpenAI --> Services
-  subgraph BackgroundWorkers
-    LinkedIn[`LinkedInGuardianWorker`]
-    Other[`Other Workers`]
-    LinkedIn --> Services
-    Other --> Services
-  end
-  Services -->|Alerts & Guidance| UI
+    User["User (Browser)"] -->|Interacts| UI["MindShield.Web (Blazor UI)"]
+    UI -->|API / SignalR| Services["Application Services"]
+    Services --> Foundry["Microsoft Foundry Pipelines"]
+    Services --> OpenAI["Azure OpenAI (configured deployment)"]
+    Services --> DB["MindShieldDbContext (EF Core / SQL Server LocalDB)"]
+    Foundry --> OpenAI
+    OpenAI --> Services
+    subgraph BackgroundWorkers
+        LinkedIn["LinkedInGuardianWorker"]
+        Other["Other Workers"]
+        LinkedIn --> Services
+        Other --> Services
+    end
+    Services -->|Alerts & Guidance| UI
 ```
-- 
-
-
-Team
+**Team**
 - Kavya Aakaveeti — .net developer : architecture, Microsoft Foundry integration, and Azure OpenAI orchestration.
 
 Setup (Developer)
@@ -81,4 +73,4 @@ Notes
 - Keep API keys out of source control. Use environment variables, user-secrets, or Key Vault.
 
 License & Contribution
-- This repository is a hackathon demo. 
+- This repository is a hackathon demo. Contributions are welcome; please avoid committing sensitive credentials.
