@@ -15,6 +15,7 @@ builder.Services.AddRazorComponents()
 // 2. Add Database
 builder.Services.AddDbContext<MindShieldDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IGuardianNotificationService, EmailGuardianService>();
 
 // 3. Add Semantic Kernel (THE AI BRAIN) 🧠
 // We create the builder first

@@ -2,6 +2,6 @@
 {
     public interface ISafetyService
     {
-        Task<SafetyResult> AnalyzeAsync(string content, RealityProfile profile);
+        Task<SafetyResult> AnalyzeAsync(string content, RealityProfile profile, string platform, string platformContext);
     }
 }

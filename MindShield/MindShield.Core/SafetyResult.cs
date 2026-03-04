@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MindShield.Core
+﻿namespace MindShield.Core
 {
     public class SafetyResult
     {
-        public string Status { get; set; } = "SAFE";   // SAFE or DANGER
-        public string Reason { get; set; } = "";
-        public string Rewrite { get; set; } = "";
-        public string Action { get; set; } = "";
+        public string Status { get; set; } = string.Empty;
+        public string RiskLevel { get; set; } = string.Empty;
 
-        public string? RiskLevel { get; set; } // Mild / Moderate / Severe
+     
+        public int ConfidenceScore { get; set; }
+
+        public string Reason { get; set; } = string.Empty;
+        public string Rewrite { get; set; } = string.Empty;
+        public string Action { get; set; } = string.Empty;
     }
 }

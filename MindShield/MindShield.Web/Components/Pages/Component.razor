@@ -9,13 +9,38 @@
 <div class="glass-panel">
     <h1>MindShield</h1>
     <p class="subtitle">
-        Protecting: <strong>@(currentUser?.FullName ?? "Loading...")</strong>
+        Protecting: <strong>@(currentUser?.FullName ?? "Alex Rivera")</strong>
     </p>
+
+    @* --- EXPANDED PLATFORM SELECTOR --- *@
+    <div class="platform-selector" style="display: flex; gap: 8px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
+        <span style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-right: 5px;">Target:</span>
+
+        <button class="btn-pill @(selectedPlatform == "LinkedIn" ? "active-platform" : "")"
+                @onclick='() => SetPlatform("LinkedIn")'>
+            LinkedIn
+        </button>
+
+        <button class="btn-pill @(selectedPlatform == "Twitter" ? "active-platform" : "")"
+                @onclick='() => SetPlatform("Twitter")'>
+            X / Twitter
+        </button>
+
+        <button class="btn-pill @(selectedPlatform == "Instagram" ? "active-platform" : "")"
+                @onclick='() => SetPlatform("Instagram")'>
+            Instagram
+        </button>
+
+        <button class="btn-pill @(selectedPlatform == "TikTok" ? "active-platform" : "")"
+                @onclick='() => SetPlatform("TikTok")'>
+            TikTok
+        </button>
+    </div>
 
     <textarea @bind="postContent"
               @oninput="OnContentChanged"
               placeholder="What's on your mind?">
-</textarea>
+    </textarea>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
         <span style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">@postContent.Length characters</span>
@@ -27,35 +52,46 @@
 
             @if (canPost)
             {
-                <button class="btn-success" @onclick="SimulatePost">🚀 Post to LinkedIn</button>
+                <button class="btn-success" @onclick="SimulatePost">🚀 Post to @selectedPlatform</button>
             }
         </div>
     </div>
 
-    @* --- NEW: PULSING ANALYZING STATE --- *@
+    @* --- PULSING ANALYZING STATE --- *@
     @if (isScanning)
     {
         <div class="analyzing-state">
             <div class="pulse-dot"></div>
-            <span>AI is scanning your draft...</span>
+            <span>AI is analyzing context for @selectedPlatform...</span>
         </div>
     }
-    @* --- EXISTING: RESULT BOX --- *@
+    @* --- RESULT BOX WITH CONFIDENCE SCORE --- *@
     else if (safetyResult != null)
     {
         <div class="alert-box @alertClass">
-            <strong>@safetyResult.Status</strong><br />
-            <p><b>Reason:</b> @safetyResult.Reason</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>@safetyResult.Status</strong>
+
+                @* THE NEW CONFIDENCE SCORE BADGE *@
+                @if (safetyResult.ConfidenceScore > 0)
+                {
+                    <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.85rem;">
+                        @safetyResult.ConfidenceScore% Confidence
+                    </span>
+                }
+            </div>
+
+            <p style="margin-top: 10px;"><b>Reason:</b> @safetyResult.Reason</p>
 
             @if (!string.IsNullOrWhiteSpace(safetyResult.Rewrite))
             {
                 <p><b>Suggested Rewrite:</b> @safetyResult.Rewrite</p>
-                <button class="btn-primary" @onclick="ApplyRewrite">
+                <button class="btn-primary" style="margin-top: 10px;" @onclick="ApplyRewrite">
                     ✏ Use Suggested Rewrite
                 </button>
             }
 
-            <p><b>Recommended Action:</b> @safetyResult.Action</p>
+            <p style="margin-top: 10px;"><b>Recommended Action:</b> @safetyResult.Action</p>
         </div>
     }
 </div>
@@ -66,7 +102,7 @@
         <span style="font-size: 1.5rem;">🔒</span>
         <div>
             <strong>Guardian Notified</strong><br />
-            <small>Sent secure alert to Sarah (Wife)</small>
+            <small>Sent secure alert to Wife</small>
         </div>
     </div>
 }
@@ -80,6 +116,9 @@
     private bool canPost = false;
     private bool isScanning = false;
 
+    // Platform State
+    private string selectedPlatform = "LinkedIn"; // Default
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -92,9 +131,17 @@
         }
     }
 
+    private void SetPlatform(string platform)
+    {
+        selectedPlatform = platform;
+        safetyResult = null;
+        canPost = false;
+        alertClass = "";
+    }
+
     private async Task AnalyzePost()
     {
-        if (currentUser == null) return;
+        if (currentUser == null || string.IsNullOrWhiteSpace(postContent)) return;
 
         isScanning = true;
         canPost = false;
@@ -102,11 +149,21 @@
         safetyResult = null;
         StateHasChanged();
 
-        safetyResult = await SafetyService.AnalyzeAsync(postContent, currentUser);
+        // Pass the context string to the AI based on the platform
+        string platformContext = selectedPlatform switch
+        {
+            "LinkedIn" => "Professional networking site. High recruiter visibility. Zero tolerance for aggressive rants, complaints about employers, or unprofessional behavior.",
+            "Twitter" => "Fast-paced, casual microblogging. Opinions and sarcasm are common. Flag as Moderate if overly aggressive.",
+            "Instagram" => "Highly visual, lifestyle-oriented network. Casual but curated. Focuses on personal branding.",
+            "TikTok" => "Gen-Z focused, highly casual, trend-driven video platform. Very loose tone. Sarcasm and venting are common.",
+            _ => "General public platform."
+        };
+
+        // Call the updated service
+        safetyResult = await SafetyService.AnalyzeAsync(postContent, currentUser, selectedPlatform, platformContext);
 
         isScanning = false;
 
-        // LOGIC: Decide based on RiskLevel
         if (safetyResult.Status == "SAFE")
         {
             alertClass = "alert-safe";
@@ -116,13 +173,10 @@
         {
             canPost = false;
 
-            // 1. Color the box based on severity
             alertClass = (safetyResult.RiskLevel?.Equals("Severe", StringComparison.OrdinalIgnoreCase) == true)
              ? "alert-danger"
              : "alert-warning";
 
-            // 2. TRIGGER GUARDIAN
-            // We check if it is DANGER *OR* if RiskLevel is Severe
             if (safetyResult.Status == "DANGER" ||
                 safetyResult.RiskLevel?.Equals("Severe", StringComparison.OrdinalIgnoreCase) == true)
             {
@@ -135,7 +189,7 @@
         }
 
         StateHasChanged();
-    } // <--- This closes AnalyzePost properly
+    }
 
     private void SimulatePost()
     {
@@ -147,7 +201,8 @@
         safetyResult = new SafetyResult
         {
             Status = "SAFE",
-            Reason = "Successfully posted to LinkedIn!",
+            ConfidenceScore = 100,
+            Reason = $"Successfully posted to {selectedPlatform}!",
             Rewrite = "",
             Action = "Post completed."
         };

@@ -248,3 +248,78 @@ textarea {
         opacity: 1;
     }
 }
+
+/* Container for the selector */
+.platform-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+/* Base style for the unselected pills */
+.btn-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    backdrop-filter: blur(4px); /* Adds to the glass effect */
+    transition: all 0.2s ease-in-out;
+}
+
+    /* Hover effect for unselected pills */
+    .btn-pill:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+    }
+
+/* The active, selected state */
+.active-platform {
+    /* Adjust these colors if your "Check Safety" button uses a different hex! */
+    background: #00b4d8;
+    border-color: #00b4d8;
+    color: #ffffff;
+    font-weight: 600;
+    /* This gives it that nice glowing effect seen in your screenshot */
+    box-shadow: 0 0 12px rgba(0, 180, 216, 0.4);
+}
+
+/* Subtle pulse animation for the scanning state (optional, but looks great) */
+.analyzing-state {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #00b4d8;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.pulse-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #00b4d8;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        box-shadow: 0 0 0 0 rgba(0, 180, 216, 0.7);
+    }
+
+    70% {
+        transform: scale(1.2);
+        box-shadow: 0 0 0 10px rgba(0, 180, 216, 0);
+    }
+
+    100% {
+        transform: scale(0.8);
+        box-shadow: 0 0 0 0 rgba(0, 180, 216, 0);
+    }
+}
