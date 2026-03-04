@@ -11,71 +11,94 @@ MindShield solves this. It's the pause button you wish you always had.
 ✨ What Makes MindShield Different
 
 🧠 Intelligent Tiered Analysis
-MindShield doesn't just flag content—it understands intent. Using Microsoft Semantic Kernel and Azure OpenAI (GPT-4o), it categorizes draft posts into three risk levels.
+
+MindShield doesn't just flag keywords—it understands intent and platform nuances. Using Microsoft Semantic Kernel and Azure OpenAI (GPT-4o), it categorizes content into three distinct risk levels:
+Safe: Professional or harmless casual updates.
+Moderate: Unprofessional, aggressive, or "cringe" content.
+Severe: Dangerous, delusional, or high-risk identity claims (e.g., impersonation).
 
 ## 🚀 Key Features
 
-* **Tiered Risk Analysis:** Uses **Microsoft Semantic Kernel** to categorize draft content into three distinct levels:
-    * **Safe:** Professional or harmless casual updates.
-    * **Moderate:** Unprofessional, aggressive, or "cringe" content.
-    * **Severe:** Dangerous, delusional, or high-risk identity claims (e.g., impersonation).
-* **Smart Intervention Logic:**
-    * **For Moderate Risk:** The AI suggests a polite, professional **Rewrite** to fix the tone while keeping the user's intent.
-    * **For Severe Risk:** The system **BLOCKS** the post entirely and triggers a **Guardian Notification** to a trusted contact (e.g., family member or mentor).
-* **Hybrid AI Architecture:** Powered by **Azure AI Foundry (GPT-4o)** for primary high-fidelity analysis, with an optional **Ollama (Phi-3)** fallback for privacy-first offline usage.
-* **Modern Dashboard:** A high-performance **Blazor Interactive Server** UI featuring Glassmorphism design and real-time scanning states.
+Multi-Platform Context Engine: Evaluates risk differently for LinkedIn, X/Twitter, Instagram, and TikTok. The AI understands that a "hot take" acceptable on X might be a reputation risk on LinkedIn.
+
+Smart Intervention Logic: * For Moderate Risk: The AI suggests a polite, professional Rewrite to fix the tone while preserving the user's core intent.
+
+For Severe Risk: The system BLOCKS the post entirely and triggers a Guardian Notification.
+
+Real-Time Guardian Alerts: Integrated with SMTP/Email services, the system bypasses the user to send an immediate, high-priority HTML alert to a trusted contact (e.g., family or mentor) when severe risk is detected.
+
+Confidence Scoring: Provides a transparency layer (e.g., 92% Confidence) for every assessment, surfacing the AI's certainty to the user.
+
+Hybrid AI Architecture: Powered by Azure AI Foundry (GPT-4o) for high-fidelity analysis, with Ollama (Phi-3) fallback support for privacy-first offline usage.
+
+Glassmorphism Dashboard: A high-performance Blazor Interactive Server UI featuring real-time scanning states and a modern, adaptive design.
 
   📊 Real-World Impact
 
   Example 1:
 
-  User: "My boss is the worst. I'm so done with this company. 
-        Time to tell everyone on LinkedIn what I really think."
+ User post: "i have chip in my brain"
+ Detection: 🔴 SEVERE (Self-harm/delusional language)
+ Action: POST BLOCKED
+ Guardian Alert: Email sent to family member:
 
-MindShield: 🟡 Moderate Risk
-Reasoning: Post expresses frustration professionally but could damage career
-Rewrite: "Grateful for the growth here, but excited for new opportunities 
-         that better align with my values. Open to conversations!"
+  Subject: 🚨 URGENT: MindShield Intervention Alert
+  
+  "A severe risk social media post was intercepted and blocked by MindShield.
+   Flagged Reason: High-risk delusional or self-harm language detected.
+   
+   Intercepted Draft: 'i have chip in my brain'
+   
+   Please reach out to check in."
 
-Example 2:
+📱 Platform-Aware Intelligence
+Same post, different platforms = different risk levels
 
-User: "I'm leaving town tomorrow. Everyone should know who I really am.
-       My real name is [celebrity], and I've been hiding my true identity."
+Post: "I'm done with my job"
 
-MindShield: 🔴 Severe Risk
-Action: POST BLOCKED
-Guardian Alert: Trusted contact notified (message: "User attempting 
-                high-risk identity claim. Please check in.")
+💼 LinkedIn: 🔴 SEVERE (Career suicide on professional network)
+𝕏 Twitter: 🟡 MODERATE (Venting is normal, but could go viral)
+📸 Instagram: 🟢 SAFE (Personal account, venting is acceptable)
+🎵 TikTok: 🟢 SAFE (Audience expects casual opinions)
 
-Example 3: Safe Content
+## 🏗️ Technical Stack
 
-Input: "Excited to announce I've been promoted to Senior Engineer! 
-        Grateful for my amazing team and mentors who got me here. 🚀"
+| Category | Technology |
+| :--- | :--- |
+| **Frontend** | Blazor / HTML / CSS |
+| **Backend** | .NET 10 / C# |
+| **AI Orchestration** | Microsoft Semantic Kernel |
+| **Database** | SQL Server / EF Core |
 
-Output: ✅ SAFE
-Confidence: 98%
-Reason: Professional announcement expressing appropriate gratitude
 
 ## 🏗️ Architecture
 
 The application hosts a Blazor front-end and an application service layer in the same process. Services call **Microsoft Foundry pipelines** that orchestrate Azure OpenAI model invocations and deterministic rules. Outcomes are stored in a SQL database and surfaced in the UI.
 
 ```mermaid
-flowchart LR
-    User["User (Browser)"] -->|Interacts| UI["MindShield.Web (Blazor UI)"]
-    UI -->|API / SignalR| Services["Application Services"]
-    Services --> Foundry["Microsoft Foundry Pipelines"]
-    Services --> OpenAI["Azure OpenAI (configured deployment)"]
-    Services --> DB["MindShieldDbContext (EF Core / SQL Server LocalDB)"]
-    Foundry --> OpenAI
-    OpenAI --> Services
-    subgraph BackgroundWorkers
-        LinkedIn["LinkedInGuardianWorker"]
-        Other["Other Workers"]
-        LinkedIn --> Services
-        Other --> Services
-    end
-    Services -->|Alerts & Guidance| UI
+flowchart TD
+    Start([User Drafts Post]) --> Input[/Content + Platform Context/]
+    Input --> SK{Semantic Kernel Analysis}
+
+    SK -->|Safe| SafeResult[✅ SAFE]
+    SK -->|Moderate| WarnResult[🟡 WARNING]
+    SK -->|Severe| DangerResult[🔴 DANGER]
+
+    SafeResult --> Publish([Allow Post to Platform])
+    
+    WarnResult --> Rewrite[AI Suggests Professional Rewrite]
+    Rewrite --> UserChoice{User Accepts?}
+    UserChoice -->|Yes| Publish
+    UserChoice -->|No| Start
+
+    DangerResult --> Block[🚫 POST BLOCKED]
+    Block --> Alert[🚨 Guardian Notification Sent]
+    Alert --> Support([Intervention Required])
+
+    style SafeResult fill:#d4edda,stroke:#28a745
+    style WarnResult fill:#fff3cd,stroke:#ffc107
+    style DangerResult fill:#f8d7da,stroke:#dc3545
+    style Block fill:#f8d7da,stroke:#dc3545,stroke-width:4px
 ```
 **Team**
 - Kavya Aakaveeti — .net developer : architecture, Microsoft Foundry integration, and Azure OpenAI orchestration.
@@ -95,7 +118,10 @@ Local setup
    - Prefer environment variables or `dotnet user-secrets` for secrets in development. Use Key Vault for production.
 3. Verify database connection
    - Ensure `ConnectionStrings:DefaultConnection` points to a reachable SQL instance.
-4. Apply EF Core migrations (if included)
+
+Configure Guardian Email (SMTP):
+dotnet user-secrets set "Email:Sender" "your-gmail@gmail.com"
+dotnet user-secrets set "Email:AppPassword" "your-16-character-app-password"
 
 ```bash
 cd MindShield/MindShield.Web
@@ -109,6 +135,11 @@ dotnet run --project MindShield/MindShield.Web
 ```
 
 6. Open the app in a browser at the URL printed by the host (typically `https://localhost:5xxx`). Background workers run inside the host and will log scanning activity.
+
+🔒 Privacy & Security
+✅ Your drafts are never permanently stored
+✅ Guardian contacts are your choice—no default surveillance
+✅ Fallback to offline Ollama for privacy-sensitive use
 
 Notes
 - The project is configured to use Azure OpenAI exclusively. Remove or disable local LLM integrations if present.
