@@ -52,16 +52,16 @@ MindShield doesn't just flag keywords—it understands intent and platform nuanc
 ### 📸 MindShield in Action
 
 **Platform Context: LinkedIn vs TikTok**
-![Platform Context](./assets/platform_rewrite.png)
+![Platform Context](MindShield/assets/platform_rewrite.png)
 
 **The Career Coach (Moderate Risk):**
-![Moderate Risk Analysis](./assets/ModerateRisk.png)
+![Moderate Risk Analysis](MindShield/assets/ModerateRisk.png)
 
 **Crisis Detection (Severe Risk):**
-![Severe Risk Analysis](./assets/Sever_risk.png)
+![Severe Risk Analysis](MindShield/assets/Sever_risk.png)
 
 **The Guardian Protocol:**
-![Guardian Mail Alert](./assets/gaurdianmailalert.png)
+![Guardian Mail Alert](MindShield/assets/gaurdianmailalert.png)
 
 ## 🏗️ Technical Stack
 
