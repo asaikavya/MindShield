@@ -9,13 +9,20 @@ using MindShield.Web.Workers;
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Add Basic Services
+
+builder.Services.AddLogging();
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddCircuitOptions(options => options.DetailedErrors = true);
 
 // 2. Add Database
 builder.Services.AddDbContext<MindShieldDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<IGuardianNotificationService, EmailGuardianService>();
+// 4. Add Background Workers
+builder.Services.AddHostedService<LinkedInGuardianWorker>();
+builder.Services.AddScoped<ISafetyService, MindShieldSafetyService>();
 
 // 3. Add Semantic Kernel (THE AI BRAIN) 🧠
 // We create the builder first
@@ -45,9 +52,9 @@ else
     );
 }
 
-// 4. Add Background Workers
-builder.Services.AddHostedService<LinkedInGuardianWorker>();
-builder.Services.AddScoped<ISafetyService, MindShieldSafetyService>();
+
+
+
 
 // 5. BUILD THE APP (Crucial: Do this AFTER adding services)
 var app = builder.Build();

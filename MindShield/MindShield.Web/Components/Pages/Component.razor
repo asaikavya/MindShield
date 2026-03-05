@@ -12,8 +12,7 @@
         Protecting: <strong>@(currentUser?.FullName ?? "Alex Rivera")</strong>
     </p>
 
-    @* --- EXPANDED PLATFORM SELECTOR --- *@
-    <div class="platform-selector" style="display: flex; gap: 8px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
+    <div class="platform-selector">
         <span style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-right: 5px;">Target:</span>
 
         <button class="btn-pill @(selectedPlatform == "LinkedIn" ? "active-platform" : "")"
@@ -37,13 +36,10 @@
         </button>
     </div>
 
-    <textarea @bind="postContent"
-              @oninput="OnContentChanged"
-              placeholder="What's on your mind?">
-    </textarea>
+    <textarea value="@postContent" @oninput="OnContentChanged" placeholder="What's on your mind?"></textarea>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-        <span style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">@postContent.Length characters</span>
+        <span style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">@(postContent?.Length ?? 0) characters</span>
 
         <div style="gap: 10px; display: flex;">
             <button class="btn-primary" @onclick="AnalyzePost" disabled="@isScanning">
@@ -57,7 +53,6 @@
         </div>
     </div>
 
-    @* --- PULSING ANALYZING STATE --- *@
     @if (isScanning)
     {
         <div class="analyzing-state">
@@ -65,14 +60,12 @@
             <span>AI is analyzing context for @selectedPlatform...</span>
         </div>
     }
-    @* --- RESULT BOX WITH CONFIDENCE SCORE --- *@
     else if (safetyResult != null)
     {
         <div class="alert-box @alertClass">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <strong>@safetyResult.Status</strong>
+                <strong>@(safetyResult.Status ?? "Unknown")</strong>
 
-                @* THE NEW CONFIDENCE SCORE BADGE *@
                 @if (safetyResult.ConfidenceScore > 0)
                 {
                     <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.85rem;">
@@ -81,9 +74,9 @@
                 }
             </div>
 
-            <p style="margin-top: 10px;"><b>Reason:</b> @safetyResult.Reason</p>
+            <p style="margin-top: 10px;"><b>Reason:</b> @(safetyResult?.Reason ?? "Analysis pending...")</p>
 
-            @if (!string.IsNullOrWhiteSpace(safetyResult.Rewrite))
+            @if (!string.IsNullOrWhiteSpace(safetyResult?.Rewrite))
             {
                 <p><b>Suggested Rewrite:</b> @safetyResult.Rewrite</p>
                 <button class="btn-primary" style="margin-top: 10px;" @onclick="ApplyRewrite">
@@ -91,7 +84,7 @@
                 </button>
             }
 
-            <p style="margin-top: 10px;"><b>Recommended Action:</b> @safetyResult.Action</p>
+            <p style="margin-top: 10px;"><b>Recommended Action:</b> @(safetyResult?.Action ?? "No action required.")</p>
         </div>
     }
 </div>
@@ -116,8 +109,7 @@
     private bool canPost = false;
     private bool isScanning = false;
 
-    // Platform State
-    private string selectedPlatform = "LinkedIn"; // Default
+    private string selectedPlatform = "LinkedIn";
 
     protected override async Task OnInitializedAsync()
     {
@@ -139,6 +131,15 @@
         alertClass = "";
     }
 
+    // Explicit method to hide the UI the moment they start typing
+    private void OnContentChanged(ChangeEventArgs e)
+    {
+        postContent = e.Value?.ToString() ?? "";
+        safetyResult = null;
+        canPost = false;
+        alertClass = "";
+    }
+
     private async Task AnalyzePost()
     {
         if (currentUser == null || string.IsNullOrWhiteSpace(postContent)) return;
@@ -149,20 +150,26 @@
         safetyResult = null;
         StateHasChanged();
 
-        // Pass the context string to the AI based on the platform
+        // 1. UPDATE THE AI INSTRUCTIONS: Tell it when to use "Severe"
         string platformContext = selectedPlatform switch
         {
-            "LinkedIn" => "Professional networking site. High recruiter visibility. Zero tolerance for aggressive rants, complaints about employers, or unprofessional behavior.",
-            "Twitter" => "Fast-paced, casual microblogging. Opinions and sarcasm are common. Flag as Moderate if overly aggressive.",
-            "Instagram" => "Highly visual, lifestyle-oriented network. Casual but curated. Focuses on personal branding.",
-            "TikTok" => "Gen-Z focused, highly casual, trend-driven video platform. Very loose tone. Sarcasm and venting are common.",
+            "LinkedIn" => "Professional site. Flag rants as DANGER, but keep RiskLevel 'Moderate'. ONLY return RiskLevel 'Severe' for self-harm, extreme toxicity, or violence.",
+            "Twitter" => "Fast-paced microblogging. Opinions are common. Flag as Moderate if overly aggressive.",
+            "Instagram" => "Highly visual, lifestyle-oriented network.",
+            "TikTok" => "Gen-Z focused. Sarcasm and venting are common.",
             _ => "General public platform."
         };
 
-        // Call the updated service
         safetyResult = await SafetyService.AnalyzeAsync(postContent, currentUser, selectedPlatform, platformContext);
 
         isScanning = false;
+
+        if (safetyResult == null)
+        {
+            alertClass = "alert-warning";
+            StateHasChanged();
+            return;
+        }
 
         if (safetyResult.Status == "SAFE")
         {
@@ -173,12 +180,11 @@
         {
             canPost = false;
 
-            alertClass = (safetyResult.RiskLevel?.Equals("Severe", StringComparison.OrdinalIgnoreCase) == true)
-             ? "alert-danger"
-             : "alert-warning";
+            // 2. Make the box RED for Danger, Yellow for Warning
+            alertClass = (safetyResult.Status == "DANGER") ? "alert-danger" : "alert-warning";
 
-            if (safetyResult.Status == "DANGER" ||
-                safetyResult.RiskLevel?.Equals("Severe", StringComparison.OrdinalIgnoreCase) == true)
+            // 3. GUARDIAN LOGIC: Only trigger the popup if the AI explicitly returns "Severe"
+            if (safetyResult.RiskLevel?.Equals("Severe", StringComparison.OrdinalIgnoreCase) == true)
             {
                 showGuardianPopup = true;
             }
@@ -190,14 +196,11 @@
 
         StateHasChanged();
     }
-
     private void SimulatePost()
     {
-        if (safetyResult?.Status != "SAFE")
-            return;
+        if (safetyResult?.Status != "SAFE") return;
 
         alertClass = "alert-safe";
-
         safetyResult = new SafetyResult
         {
             Status = "SAFE",
@@ -220,12 +223,5 @@
             canPost = false;
             alertClass = "";
         }
-    }
-
-    private void OnContentChanged(ChangeEventArgs e)
-    {
-        safetyResult = null;
-        canPost = false;
-        alertClass = "";
     }
 }

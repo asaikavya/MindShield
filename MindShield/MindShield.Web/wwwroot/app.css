@@ -1,24 +1,34 @@
-/* Update your body to be a clean slate */
-body {
+/* =========================================
+   1. GLOBAL LAYOUT & BACKGROUND
+   ========================================= */
+body, html {
     background: #1a1a2e !important;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
     margin: 0;
     padding: 0;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden; /* This stops the flickering scrollbar */
+    /* Allow the page to grow and scroll naturally without crashing */
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    /* Give the UI breathing room */
+    align-items: flex-start !important;
+    padding-top: 30px !important;
+    padding-bottom: 30px !important;
 }
 
 /* Force the main container to center the Glass Panel */
 .main-container {
-    height: 100vh;
+    min-height: 100vh; /* Changed to min-height so it can stretch down! */
     width: 100vw;
     display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center; /* Centers vertically */
+    justify-content: center;
+    align-items: flex-start; /* Ensures content doesn't get cut off at the top */
 }
 
-/* Ensure the glass panel is ready for centering */
+/* =========================================
+   2. GLASSMORPHISM PANEL
+   ========================================= */
 .glass-panel {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(12px);
@@ -30,25 +40,30 @@ body {
     width: 600px;
     max-width: 90%;
     text-align: center;
-    /* Ensure it is visible and centered */
+    /* Visibility and positioning */
     display: block;
     opacity: 1 !important;
     visibility: visible !important;
+    /* Margins for scrolling breathing room */
+    margin-top: 20px !important;
+    margin-bottom: 50px !important;
+    height: auto !important;
 }
 
-/* HEADERS */
+/* =========================================
+   3. TYPOGRAPHY & HEADERS
+   ========================================= */
 h1 {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
-    color: #00d2ff; /* Solid Neon Blue */
-    text-shadow: 0 0 15px rgba(0, 210, 255, 0.6); /* The Cyberpunk Glow */
+    color: #00d2ff;
+    text-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
     font-weight: 700;
     letter-spacing: 1px;
-    background: none !important; /* Forces the blue background box to die */
-    border: none !important; /* Removes any accidental borders */
-    outline: none !important; /* Removes the browser's focus ring */
-    box-shadow: none !important; /* Removes any default shadow boxes */
-    /* This prevents the "jumping" effect during load */
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
     display: inline-block;
     margin: 0 auto 0.5rem auto;
 }
@@ -58,7 +73,9 @@ h1 {
     margin-bottom: 2rem;
 }
 
-/* TEXT AREA */
+/* =========================================
+   4. FORM ELEMENTS (TEXTAREA)
+   ========================================= */
 textarea {
     width: 100%;
     height: 150px;
@@ -78,7 +95,9 @@ textarea {
         border-color: #00d2ff;
     }
 
-/* BUTTONS */
+/* =========================================
+   5. BUTTONS & PLATFORM SELECTOR
+   ========================================= */
 .btn-primary {
     background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
     border: none;
@@ -96,81 +115,6 @@ textarea {
         transform: scale(1.05);
     }
 
-/* ALERTS & POPUPS */
-.alert-box {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    border-radius: 10px;
-    font-weight: 500;
-    animation: slideIn 0.5s ease;
-    max-height: 120px; /* Limits the height */
-    overflow-y: auto; /* Adds a scrollbar if text is too long */
-}
-
-.alert-safe {
-    background: rgba(46, 204, 113, 0.2);
-    border: 1px solid #2ecc71;
-    color: #2ecc71;
-}
-.alert-danger {
-    /* Cooler Gradient Red */
-    background: linear-gradient(90deg, rgba(220, 53, 69, 0.2) 0%, rgba(255, 107, 107, 0.2) 100%);
-    border: 1px solid #ff6b6b;
-    color: #ffffff; /* White text is easier to read */
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5); /* Slight shadow for readability */
-}
-
-.alert-warning {
-    /* Cooler Gradient Yellow */
-    background: linear-gradient(90deg, rgba(241, 196, 15, 0.2) 0%, rgba(243, 156, 18, 0.2) 100%);
-    border: 1px solid #f1c40f;
-    color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-
-/* THE "GUARDIAN NOTIFIED" POPUP */
-.guardian-toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #ffffff; /* Solid white to ensure visibility */
-    color: #333; /* Dark text */
-    padding: 15px 25px;
-    border-radius: 10px;
-    border-left: 5px solid #ff6b6b; /* Red accent on the left */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Strong shadow */
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    animation: slideInRight 0.5s ease;
-    z-index: 9999 !important; /* FORCE IT TO THE TOP */
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Success / Post Button */
 .btn-success {
     background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%);
     border: none;
@@ -179,10 +123,10 @@ textarea {
     color: white;
     font-weight: bold;
     cursor: pointer;
-    margin-left: 10px; /* Space it out from the Check button */
+    margin-left: 10px;
     box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
     transition: transform 0.2s;
-    animation: popIn 0.3s ease-out; /* Makes it pop in nicely */
+    animation: popIn 0.3s ease-out;
 }
 
     .btn-success:hover {
@@ -190,66 +134,6 @@ textarea {
         background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
     }
 
-/* Animation for the button appearing */
-@keyframes popIn {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-
-    80% {
-        transform: scale(1.1);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-/* In app.css */
-.analyzing-state {
-    margin-top: 20px;
-    padding: 15px;
-    text-align: center;
-    color: #cbd5e1; /* Light gray text */
-    font-family: 'Segoe UI', sans-serif;
-    font-style: italic;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05); /* Faint glass background */
-}
-
-/* Optional: A cool pulsing dot animation */
-.pulse-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #00d4ff; /* Cyan color */
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    50% {
-        transform: scale(1.5);
-        opacity: 0.5;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* Container for the selector */
 .platform-selector {
     display: flex;
     gap: 10px;
@@ -257,7 +141,6 @@ textarea {
     align-items: center;
 }
 
-/* Base style for the unselected pills */
 .btn-pill {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -267,36 +150,92 @@ textarea {
     font-size: 0.9rem;
     font-family: inherit;
     cursor: pointer;
-    backdrop-filter: blur(4px); /* Adds to the glass effect */
+    backdrop-filter: blur(4px);
     transition: all 0.2s ease-in-out;
 }
 
-    /* Hover effect for unselected pills */
     .btn-pill:hover {
         background: rgba(255, 255, 255, 0.1);
         border-color: rgba(255, 255, 255, 0.2);
         color: #ffffff;
     }
 
-/* The active, selected state */
 .active-platform {
-    /* Adjust these colors if your "Check Safety" button uses a different hex! */
     background: #00b4d8;
     border-color: #00b4d8;
     color: #ffffff;
     font-weight: 600;
-    /* This gives it that nice glowing effect seen in your screenshot */
     box-shadow: 0 0 12px rgba(0, 180, 216, 0.4);
 }
 
-/* Subtle pulse animation for the scanning state (optional, but looks great) */
-.analyzing-state {
+/* =========================================
+   6. ALERTS & GUARDIAN POPUP
+   ========================================= */
+.alert-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 10px;
+    font-weight: 500;
+    animation: slideIn 0.5s ease;
+    max-height: auto;
+    overflow-y: visible;
+}
+
+.alert-safe {
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+}
+
+.alert-danger {
+    background: linear-gradient(90deg, rgba(220, 53, 69, 0.2) 0%, rgba(255, 107, 107, 0.2) 100%);
+    border: 1px solid #ff6b6b;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.alert-warning {
+    background: linear-gradient(90deg, rgba(241, 196, 15, 0.2) 0%, rgba(243, 156, 18, 0.2) 100%);
+    border: 1px solid #f1c40f;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.guardian-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #ffffff;
+    color: #333;
+    padding: 15px 25px;
+    border-radius: 10px;
+    border-left: 5px solid #ff6b6b;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
+    animation: slideInRight 0.5s ease;
+    z-index: 9999 !important;
+}
+
+/* =========================================
+   7. AI ANALYZING STATE & ANIMATIONS
+   ========================================= */
+.analyzing-state {
+    margin-top: 20px;
+    padding: 15px;
+    text-align: center;
     color: #00b4d8;
+    font-family: 'Segoe UI', sans-serif;
+    font-style: italic;
     font-weight: bold;
-    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .pulse-dot {
@@ -323,3 +262,65 @@ textarea {
         box-shadow: 0 0 0 0 rgba(0, 180, 216, 0);
     }
 }
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+/* =========================================
+   8. BLAZOR SYSTEM UI (HIDDEN)
+   ========================================= */
+#blazor-error-ui {
+    display: none; /* THIS IS THE MAGIC LINE */
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    color: black;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
