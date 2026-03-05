@@ -48,6 +48,20 @@ MindShield doesn't just flag keywords—it understands intent and platform nuanc
 * 𝕏 **Twitter:** 🟡 MODERATE (Venting is normal, but could go viral)
 * 📸 **Instagram:** 🟢 SAFE (Personal account, venting is acceptable)
 * 🎵 **TikTok:** 🟢 SAFE (Audience expects casual opinions)
+  
+### 📸 MindShield in Action
+
+**Platform Context: LinkedIn vs TikTok**
+![Platform Context](./assets/platform_rewrite.png)
+
+**The Career Coach (Moderate Risk):**
+![Moderate Risk Analysis](./assets/ModerateRisk.png)
+
+**Crisis Detection (Severe Risk):**
+![Severe Risk Analysis](./assets/Sever_risk.png)
+
+**The Guardian Protocol:**
+![Guardian Mail Alert](./assets/gaurdianmailalert.png)
 
 ## 🏗️ Technical Stack
 
