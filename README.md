@@ -1,70 +1,53 @@
 # MindShield: Professional Reputation Guardian 🛡️
+
 **MindShield** is an AI-driven safety net for social media, built for the **Microsoft Innovation Studio Hackathon**. It acts as an intelligent "pause button" to ensure your digital footprint always reflects your best professional self.
 
-**🎯 The Problem**<br>
-
+## 🎯 The Problem
 We live in an era of digital permanence. A thoughtless tweet. An angry comment. A cringe-worthy post. These moments—seconds to create, instantly public—can shape careers, damage relationships, and define reputations for years.
 
 MindShield solves this. It's the **pause button** you wish you always had.
 
-**✨ What Makes MindShield Different**
+## ✨ What Makes MindShield Different
 
-**🧠 Intelligent Tiered Analysis**
-MindShield doesn't just flag keywords—it understands intent and platform nuances. Using **Microsoft Semantic Kernel** and **Azure OpenAI (GPT-4o)**, it categorizes content into three distinct risk levels:<br>
-
-+ **Safe**: Professional or harmless casual updates.<br>
-+ **Moderate**: Unprofessional, aggressive, or "cringe" content.<br>
-+ **Severe**: Dangerous, delusional, or high-risk identity claims (e.g., impersonation).
+### 🧠 Intelligent Tiered Analysis
+MindShield doesn't just flag keywords—it understands intent and platform nuances. Using **Microsoft Semantic Kernel** and **Azure OpenAI (GPT-4o)**, it categorizes content into three distinct risk levels:
+* **Safe:** Professional or harmless casual updates.
+* **Moderate:** Unprofessional, aggressive, or "cringe" content.
+* **Severe:** Dangerous, delusional, or high-risk identity claims (e.g., impersonation).
 
 ## 🚀 Key Features
 
-**🌐 Multi-Platform Context Engine**: Evaluates risk differently for LinkedIn, X/Twitter, Instagram, and TikTok. The AI understands that a "hot take" acceptable on X might be a reputation risk on LinkedIn.
+* **🌐 Multi-Platform Context Engine:** Evaluates risk differently for LinkedIn, X/Twitter, Instagram, and TikTok. The AI understands that a "hot take" acceptable on X might be a reputation risk on LinkedIn.
+* **✍️ Smart Intervention Logic:**
+  * **For Moderate Risk:** The AI suggests a professional rewrite that preserves the user’s intent while improving tone and clarity.
+    > **Original:** “My manager has no idea what they're doing.” <br>
+    > **Rewritten:** “I’ve been reflecting on leadership challenges at work and how communication can improve team effectiveness.”
+  * **For Severe Risk:** The system BLOCKS the post entirely and triggers a **Guardian Notification**.
+* **🚨 Real-Time Guardian Alerts:** Integrated with SMTP/Email services, the system bypasses the user to send an immediate, high-priority HTML alert to a trusted contact (e.g., family or mentor) when severe risk is detected.
+* **📊 Confidence Scoring:** Provides a transparency layer (e.g., 92% Confidence) for every assessment, surfacing the AI's certainty to the user.
+* **🧠 Hybrid AI Architecture:** Powered by Azure AI Foundry (GPT-4o) for high-fidelity analysis, with Ollama (Phi-3) fallback support for privacy-first offline usage.
+* **💻 Glassmorphism Dashboard:** A high-performance Blazor Interactive Server UI featuring real-time scanning states and a modern, adaptive design.
 
-**✍️ Smart Intervention Logic**:  
+## 📊 Real-World Impact
 
- **For Moderate Risk:**
-The AI suggests a professional rewrite that preserves the user’s intent while improving tone and clarity.<br>
-Example transformation:<br>
+**Example 1: High-Risk Intervention**
+* **User post:** "I have chip in my brain"
+* **Detection:** 🔴 SEVERE (Self-harm/delusional language)
+* **Action:** POST BLOCKED
+* **Guardian Alert:** Email sent to family member:
+  > **Subject:** 🚨 URGENT: MindShield Intervention Alert
+  > "A severe risk social media post was intercepted and blocked by MindShield.
+  > **Flagged Reason:** High-risk delusional or self-harm language detected.
+  > **Intercepted Draft:** 'i have chip in my brain'
+  > Please reach out to check in."
 
-+ **Original**<br>
-“My manager has no idea what they're doing.”<br>
-+ **Rewritten**<br>
-“I’ve been reflecting on leadership challenges at work and how communication can improve team effectiveness.”<br>
-
-**🚫For Severe Risk**: The system BLOCKS the post entirely and triggers a **Guardian Notification**.
-
-**🚨 Real-Time Guardian Alerts**: Integrated with SMTP/Email services, the system bypasses the user to send an immediate, high-priority HTML alert to a trusted contact (e.g., family or mentor) when severe risk is detected.
-
-+ **Confidence Scoring:** Provides a transparency layer (e.g., 92% Confidence) for every assessment, surfacing the AI's certainty to the user.
-
-+ **Hybrid AI Architecture**: Powered by Azure AI Foundry (GPT-4o) for high-fidelity analysis, with Ollama (Phi-3) fallback support for privacy-first offline usage.
-
-+ **Glassmorphism Dashboard**: A high-performance Blazor Interactive Server UI featuring real-time scanning states and a modern, adaptive design.
-
-  ### 📊 Real-World Impact
-
-**Example 1**:
-
- + **User post**: "I have chip in my brain"
- + **Detection**: 🔴 SEVERE (Self-harm/delusional language)
- + **Action**: POST BLOCKED
- + **Guardian Alert**: Email sent to family member:
-
-    >  Subject: 🚨 URGENT: MindShield Intervention Alert <br>
-    >  "A severe risk social media post was intercepted and blocked by MindShield.<br>
-    > **Flagged Reason** : High-risk delusional or self-harm language detected.<br>
-    > **Intercepted Draft**: 'i have chip in my brain'<br>
-    >  Please reach out to check in."
-
-
-## 📱 Platform-Aware Intelligence
-Same post, different platforms = different risk levels
-**Post**: "I'm done with my job"
-
-+ 💼 **LinkedIn**: 🔴 SEVERE (Career suicide on professional network)<br>
-+ 𝕏 **Twitter**: 🟡 MODERATE (Venting is normal, but could go viral)<br>
-+ 📸 **Instagram**: 🟢 SAFE (Personal account, venting is acceptable)<br>
-+ 🎵 **TikTok**: 🟢 SAFE (Audience expects casual opinions)
+### 📱 Platform-Aware Intelligence
+*Same post, different platforms = different risk levels*
+**Post:** "I'm done with my job"
+* 💼 **LinkedIn:** 🔴 SEVERE (Career suicide on professional network)
+* 𝕏 **Twitter:** 🟡 MODERATE (Venting is normal, but could go viral)
+* 📸 **Instagram:** 🟢 SAFE (Personal account, venting is acceptable)
+* 🎵 **TikTok:** 🟢 SAFE (Audience expects casual opinions)
 
 ## 🏗️ Technical Stack
 
@@ -74,7 +57,6 @@ Same post, different platforms = different risk levels
 | **Backend** | .NET 10 / C# |
 | **AI Orchestration** | Microsoft Semantic Kernel |
 | **Database** | SQL Server / EF Core |
-
 
 ## 🏗️ Architecture
 
@@ -163,16 +145,18 @@ MindShield is designed with responsible AI principles:<br>
 3.**Verify database connection:**
     * Ensure ConnectionStrings:DefaultConnection points to a reachable SQL instance.
 4. **Configure Guardian Email (SMTP):** <br>
-   dotnet user-secrets set "Email:Sender" "your-gmail@gmail.com" <br>
-   dotnet user-secrets set "Email:AppPassword" "your-16-character-app-password"
+        cd MindShield/MindShield.Web  <br>
+        dotnet user-secrets init <br>
+        dotnet user-secrets set "Email:Sender" "your-gmail@gmail.com"  <br>
+        dotnet user-secrets set "Email:AppPassword" "your-16-character-app-password"
+   
 6. **Apply EF Core Migrations & Update Database:**
    ```bash
-   cd MindShield/MindShield.Web
     dotnet ef database update
    ```
 7. **Run the application**:
    ```bash
-   dotnet run --project MindShield/MindShield.Web
+   dotnet run
    ```
 8.  **View the app**: Open a browser at the URL printed by the host (typically https://localhost:5xxx). Background workers run inside the host and will log scanning activity.
 
