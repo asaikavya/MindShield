@@ -1,6 +1,6 @@
 # MindShield: Professional Reputation Guardian 🛡️
 
-**MindShield** is an AI-driven safety net for social media, built for the **Microsoft Innovation Studio Hackathon**. It acts as an intelligent "pause button" to ensure your digital footprint always reflects your best professional self.
+**MindShield** is an AI-driven safety net for social media, built for the **Microsoft AI Dev Days Hackathon**. Powered by the **Microsoft Agent Framework**, **Microsoft Foundry**, and developed using **GitHub Copilot**, it acts as an intelligent "pause button" to ensure your digital footprint always reflects your best professional self.
 
 ## 🎯 The Problem
 
@@ -13,15 +13,13 @@ MindShield solves this. It's the **pause button** you wish you always had.
 Three converging trends make MindShield especially relevant today:
 
 + **Digital Permanence Despite Deletion**: While users can delete social media posts, the internet rarely forgets. Content can be screenshotted, archived, or reshared within seconds. In many cases, the reputational damage happens before the original post is removed, making prevention more valuable than cleanup.
-
-+ **The AI Breakthrough:** Traditional moderation tools relied on simple keyword filters that often missed context. With advances in modern AI models such as Azure OpenAI GPT-4o and orchestration frameworks like Microsoft Semantic Kernel, systems can now understand nuance, tone, sarcasm, and platform-specific expectations—making an intelligent “pause before posting” system technically feasible for the first time.
-
-+ **Growing Corporate Compliance Pressure:** Organizations face increasing reputational and regulatory risks tied to employee social media activity. Companies are seeking proactive tools that help prevent brand-damaging posts, confidential information leaks, or compliance violations before they happen.
++ **The Agentic AI Breakthrough:** Traditional moderation tools relied on simple keyword filters that often missed context. Today, using the **Microsoft Agent Framework** and models routed through **Microsoft Foundry**, we can orchestrate specialized AI agents that understand nuance, tone, sarcasm, and platform-specific expectations.
++ **Growing Corporate Compliance Pressure:** Organizations face increasing reputational and regulatory risks tied to employee social media activity. Companies need proactive, immutable audit trails to prevent brand-damaging posts before they happen.
 
 ## ✨ What Makes MindShield Different
 
-### 🧠 Intelligent Tiered Analysis
-MindShield doesn't just flag keywords—it understands intent and platform nuances. Using **Microsoft Semantic Kernel** and **Azure OpenAI (GPT-4o)**, it categorizes content into three distinct risk levels:
+### 🤖 Agentic Tiered Analysis
+MindShield doesn't just flag keywords—it orchestrates intelligent agents to evaluate intent and platform nuances. Using the **Microsoft Agent Framework** and **Azure OpenAI (GPT-4o)** managed via **Microsoft Foundry**, it deploys specialized agents to categorize content:
 * **Safe:** Professional or harmless casual updates.
 * **Moderate:** Unprofessional, aggressive, or "cringe" content.
 * **Severe:** Dangerous, delusional, or high-risk identity claims (e.g., impersonation).
@@ -29,11 +27,11 @@ MindShield doesn't just flag keywords—it understands intent and platform nuanc
 ## 🚀 Key Features
 
 * **🌐 Multi-Platform Context Engine:** Evaluates risk differently for LinkedIn, X/Twitter, Instagram, and TikTok. The AI understands that a "hot take" acceptable on X might be a reputation risk on LinkedIn.
-* **✍️ Smart Intervention Logic:**
-  * **For Moderate Risk:** The AI suggests a professional rewrite that preserves the user’s intent while improving tone and clarity.
+* **✍️ Smart Intervention Logic (Coaching Agent):**
+  * **For Moderate Risk:** The Coaching Agent suggests a professional rewrite that preserves the user’s intent while improving tone and clarity.
     > **Original:** “My manager has no idea what they're doing.” <br>
     > **Rewritten:** “I’ve been reflecting on leadership challenges at work and how communication can improve team effectiveness.”
-  * **For Severe Risk:** The system BLOCKS the post entirely and triggers a **Guardian Notification**.
+  * **For Severe Risk (Governance Agent):** The system BLOCKS the post entirely and triggers a **Guardian Notification**.
 * **🚨 Real-Time Guardian Alerts:** Integrated with SMTP/Email services, the system bypasses the user to send an immediate, high-priority HTML alert to a trusted contact (e.g., family or mentor) when severe risk is detected.
 * **📊 Confidence Scoring:** Provides a transparency layer (e.g., 92% Confidence) for every assessment, surfacing the AI's certainty to the user.
 * **🧠 Hybrid AI Architecture:** Powered by Azure AI Foundry (GPT-4o) for high-fidelity analysis, with Ollama (Phi-3) fallback support for privacy-first offline usage.
@@ -74,37 +72,38 @@ MindShield doesn't just flag keywords—it understands intent and platform nuanc
 **The Guardian Protocol:**
 ![Guardian Mail Alert](MindShield/assets/gaurdianmailalert.png)
 
-## 🏗️ Technical Stack
+## 🏗️ Technical Stack (AI Dev Days Hero Tech)
 
 | Category | Technology |
 | :--- | :--- |
+| **AI Orchestration** | **Microsoft Agent Framework** / **Microsoft Foundry** |
+| **Development** | **GitHub Copilot Agent Mode** / Visual Studio |
 | **Frontend** | Blazor / HTML / CSS |
 | **Backend** | .NET 10 / C# |
-| **AI Orchestration** | Microsoft Semantic Kernel |
-| **Database** | SQL Server / EF Core |
+| **Database & Cloud** | Azure SQL / Entity Framework Core / Azure App Service ready |
 
 ## 🏗️ Architecture
 
-The application hosts a Blazor front-end and an application service layer in the same process. Services call **Microsoft Foundry pipelines** that orchestrate Azure OpenAI model invocations and deterministic rules. Outcomes are stored in a SQL database and surfaced in the UI.
+The application hosts a Blazor front-end and an application service layer in the same process. Services call **Microsoft Foundry pipelines** and leverage the **Microsoft Agent Framework** to orchestrate Azure OpenAI models and deterministic rules. Outcomes are stored in an Azure-ready SQL database and surfaced in the UI.
 
 ```mermaid
 flowchart TD
     Start([User Drafts Post]) --> Input[/Content + Platform Context/]
-    Input --> SK{Semantic Kernel Analysis}
+    Input --> AgentFramework{Microsoft Agent Framework / Foundry}
 
-    SK -->|Safe| SafeResult[✅ SAFE]
-    SK -->|Moderate| WarnResult[🟡 WARNING]
-    SK -->|Severe| DangerResult[🔴 DANGER]
+    AgentFramework -->|Safe| SafeResult[✅ SAFE]
+    AgentFramework -->|Moderate| WarnResult[🟡 WARNING]
+    AgentFramework -->|Severe| DangerResult[🔴 DANGER]
 
     SafeResult --> Publish([Allow Post to Platform])
     
-    WarnResult --> Rewrite[AI Suggests Professional Rewrite]
+    WarnResult --> Rewrite[Coaching Agent Suggests Professional Rewrite]
     Rewrite --> UserChoice{User Accepts?}
     UserChoice -->|Yes| Publish
     UserChoice -->|No| Start
 
     DangerResult --> Block[🚫 POST BLOCKED]
-    Block --> Alert[🚨 Guardian Notification Sent]
+    Block --> Alert[Governance Agent Sends Guardian Alert]
     Alert --> Support([Intervention Required])
 
     style SafeResult fill:#d4edda,stroke:#28a745
