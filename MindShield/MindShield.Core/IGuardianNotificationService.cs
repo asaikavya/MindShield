@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 
-namespace MindShield.Web.Services
+namespace MindShield.Core
 {
     public interface IGuardianNotificationService
     {
-        Task SendAlertAsync(string guardianName, string guardianEmail, string riskReason, string originalText);
+        Task SendAlertAsync(string targetName, string targetEmail, string subject, string body);
     }
 }

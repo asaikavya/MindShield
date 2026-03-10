@@ -1,5 +1,9 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Mail;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using MindShield.Core; // This fixes the CS0246 error!
 
 namespace MindShield.Web.Services
 {
@@ -12,11 +16,10 @@ namespace MindShield.Web.Services
             _config = config;
         }
 
-        public async Task SendAlertAsync(string guardianName, string guardianEmail, string riskReason, string originalText)
+        public async Task SendAlertAsync(string targetName, string targetEmail, string riskReason, string originalText)
         {
             try
             {
-                // Pull these from dotnet user-secrets
                 var senderEmail = _config["Email:Sender"];
                 var senderPassword = _config["Email:AppPassword"];
 
@@ -26,15 +29,19 @@ namespace MindShield.Web.Services
                     EnableSsl = true
                 };
 
+                string subjectLine = targetName == "SecOps Team"
+                    ? "🚨 URGENT: MindShield Corporate Security Alert"
+                    : "🚨 URGENT: MindShield Intervention Alert";
+
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(senderEmail, "MindShield Guardian"),
-                    Subject = "🚨 URGENT: MindShield Intervention Alert",
+                    Subject = subjectLine,
                     IsBodyHtml = true,
                     Body = $@"
                         <div style='font-family: Arial, sans-serif; padding: 20px; border: 2px solid #d9534f; border-radius: 10px; max-width: 500px;'>
                             <h2 style='color: #d9534f; margin-top: 0;'>🛡️ MindShield Intervention</h2>
-                            <p>Hello {guardianName},</p>
+                            <p>Hello {targetName},</p>
                             <p>A severe risk social media post was just intercepted and blocked by MindShield.</p>
                             <p><strong>Flagged Reason:</strong> {riskReason}</p>
                             <hr style='border: 1px solid #eee; margin: 20px 0;'/>
@@ -48,14 +55,13 @@ namespace MindShield.Web.Services
                         </div>"
                 };
 
-                mailMessage.To.Add(guardianEmail);
+                mailMessage.To.Add(targetEmail);
 
                 await client.SendMailAsync(mailMessage);
-                Console.WriteLine($"[GUARDIAN ALERT] Email fired off successfully to {guardianEmail}.");
+                Console.WriteLine($"[GUARDIAN ALERT] HTML Email fired off successfully to {targetName} at {targetEmail}.");
             }
             catch (Exception ex)
             {
-                // Failsafe so the demo UI doesn't crash if the email bounces
                 Console.WriteLine($"[GUARDIAN ALERT FAILED] {ex.Message}");
             }
         }

@@ -14,6 +14,11 @@ builder.Services.AddLogging();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddCircuitOptions(options => options.DetailedErrors = true);
+builder.Services.AddScoped<IClassifierAgent, ClassifierAgent>();
+builder.Services.AddScoped<ICoachingAgent, CoachingAgent>();
+builder.Services.AddScoped<IGovernanceAgent, GovernanceAgent>();
+// Make sure this one is still here too:
+builder.Services.AddScoped<ISafetyService, MindShieldSafetyService>();
 
 // 2. Add Database
 builder.Services.AddDbContext<MindShieldDbContext>(options =>

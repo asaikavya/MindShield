@@ -1,10 +1,146 @@
 ﻿@page "/"
 @using MindShield.Web
 @using MindShield.Core
+@using MindShield.Web.Services
 @using Microsoft.EntityFrameworkCore
 @inject MindShieldDbContext DbContext
 @inject ISafetyService SafetyService
+@inject IGovernanceAgent Governor
 @rendermode InteractiveServer
+
+<style>
+    /* New Styles for the 5-Second Intervention Modal */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .severe-alert {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        border-top: 8px solid #d9534f;
+        color: #333;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 10px 25px rgba(217, 83, 79, 0.4);
+    }
+
+    .alert-title {
+        color: #d9534f;
+        margin-top: 0;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+
+    .countdown-timer {
+        font-size: 4.5rem;
+        font-weight: 900;
+        color: #d9534f;
+        margin: 15px 0;
+        line-height: 1;
+    }
+
+    .btn-cancel-alert {
+        background: #222;
+        color: white;
+        border: none;
+        font-size: 1rem;
+        padding: 15px 20px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.2s;
+    }
+
+        .btn-cancel-alert:hover {
+            background: #000;
+        }
+
+    /* ✨ NEW: Container to hold logs and alert box side-by-side */
+    .results-container {
+        display: flex;
+        gap: 15px; /* Tighter gap */
+        margin-top: 10px; /* Less space above */
+        align-items: flex-start;
+    }
+
+    .agent-trace-panel {
+        flex: 1;
+        background: #0d1117;
+        color: #58a6ff;
+        font-family: 'Courier New', Courier, monospace;
+        border-radius: 8px;
+        border: 1px solid #30363d;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        overflow: hidden;
+        text-align: left;
+    }
+
+    .trace-header {
+        background: #161b22;
+        padding: 5px 10px; /* ⬇️ Reduced padding */
+        border-bottom: 1px solid #30363d;
+        color: #c9d1d9;
+        font-size: 0.85rem;
+        display: flex;
+        flex-direction: row; /* Forces it to stay horizontal */
+        white-space: nowrap; /* Prevents the dots from wrapping */
+        gap: 10px;
+        align-items: center;
+    }
+
+    .trace-body {
+        padding: 10px; /* ⬇️ Reduced padding */
+        font-size: 0.75rem; /* ⬇️ Smaller font to fit more lines */
+        min-height: auto;
+    }
+
+    .trace-line {
+        margin-bottom: 2px; /* ⬇️ Tighter line spacing */
+        line-height: 1.3;
+    }
+
+    .blink {
+        animation: blinker 1s linear infinite;
+    }
+
+    .alert-box {
+        padding: 15px !important; /* ⬇️ Thinner padding inside the box */
+    }
+
+        .alert-box p {
+            margin-top: 6px !important; /* ⬇️ Brings the paragraphs closer together */
+            font-size: 0.85rem; /* ⬇️ Slightly smaller text */
+            line-height: 1.4;
+        }
+
+        .alert-box button {
+            padding: 6px 12px !important; /* ⬇️ Makes the blue button shorter */
+            margin-top: 6px !important;
+        }
+
+    textarea {
+        height: 80px; /* Prevents the text box from being too tall */
+        min-height: 80px;
+    }
+
+    @@keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+</style>
 
 <div class="glass-panel">
     <h1>MindShield</h1>
@@ -53,41 +189,76 @@
         </div>
     </div>
 
-    @if (isScanning)
-    {
-        <div class="analyzing-state">
-            <div class="pulse-dot"></div>
-            <span>AI is analyzing context for @selectedPlatform...</span>
-        </div>
-    }
-    else if (safetyResult != null)
-    {
-        <div class="alert-box @alertClass">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <strong>@(safetyResult.Status ?? "Unknown")</strong>
+    @* ✨ NEW: The Side-by-Side Flex Container ✨ *@
+    <div class="results-container">
 
-                @if (safetyResult.ConfidenceScore > 0)
-                {
-                    <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.85rem;">
-                        @safetyResult.ConfidenceScore% Confidence
-                    </span>
-                }
+        @if (isScanning || AgentTraceLogs.Any())
+        {
+            <div class="agent-trace-panel">
+                <div class="trace-header">
+                    <span>🔴 🟡 🟢</span>
+                    <strong>Multi-Agent Diagnostics</strong>
+                </div>
+                <div class="trace-body">
+                    @foreach (var log in AgentTraceLogs)
+                    {
+                        <div class="trace-line">@log</div>
+                    }
+                    @if (isScanning)
+                    {
+                        <div class="trace-line blink">_</div>
+                    }
+                </div>
             </div>
+        }
 
-            <p style="margin-top: 10px;"><b>Reason:</b> @(safetyResult?.Reason ?? "Analysis pending...")</p>
+        @if (!isScanning && safetyResult != null)
+        {
+            <div class="alert-box @alertClass" style="flex: 1; margin-top: 0; height: fit-content;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong>@(safetyResult.Status ?? "Unknown")</strong>
 
-            @if (!string.IsNullOrWhiteSpace(safetyResult?.Rewrite))
-            {
-                <p><b>Suggested Rewrite:</b> @safetyResult.Rewrite</p>
-                <button class="btn-primary" style="margin-top: 10px;" @onclick="ApplyRewrite">
-                    ✏ Use Suggested Rewrite
-                </button>
-            }
+                    @if (safetyResult.ConfidenceScore > 0)
+                    {
+                        <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.85rem;">
+                            @safetyResult.ConfidenceScore% Confidence
+                        </span>
+                    }
+                </div>
 
-            <p style="margin-top: 10px;"><b>Recommended Action:</b> @(safetyResult?.Action ?? "No action required.")</p>
-        </div>
-    }
+                <p style="margin-top: 10px;"><b>Reason:</b> @(safetyResult?.Reason ?? "Analysis pending...")</p>
+
+                @if (!string.IsNullOrWhiteSpace(safetyResult?.Rewrite))
+                {
+                    <p><b>Suggested Rewrite:</b> @safetyResult.Rewrite</p>
+                    <button class="btn-primary" style="margin-top: 10px;" @onclick="ApplyRewrite">
+                        ✏ Use Suggested Rewrite
+                    </button>
+                }
+
+                <p style="margin-top: 10px;"><b>Recommended Action:</b> @(safetyResult?.Action ?? "No action required.")</p>
+            </div>
+        }
+    </div>
 </div>
+
+@* ✨ THE NEW 5-SECOND COUNTDOWN MODAL ✨ *@
+@if (showCountdownModal)
+{
+    <div class="modal-backdrop">
+        <div class="modal-content severe-alert">
+            <h3 class="alert-title">🚨 Critical Intervention</h3>
+            <p style="margin-bottom: 5px;"><strong>Flagged:</strong> @(safetyResult?.Reason)</p>
+            <p style="font-size: 0.9rem; color: #666;">This post violates severe safety/compliance protocols. Alerting emergency contacts in...</p>
+
+            <div class="countdown-timer">@countdownTicks</div>
+
+            <button class="btn-cancel-alert" @onclick="CancelAlert">
+                CANCEL POST & DISMISS ALERT
+            </button>
+        </div>
+    </div>
+}
 
 @if (showGuardianPopup)
 {
@@ -95,7 +266,7 @@
         <span style="font-size: 1.5rem;">🔒</span>
         <div>
             <strong>Guardian Notified</strong><br />
-            <small>Sent secure alert to Wife</small>
+            <small>Sent secure alert to safety contact.</small>
         </div>
     </div>
 }
@@ -108,8 +279,18 @@
     private bool showGuardianPopup = false;
     private bool canPost = false;
     private bool isScanning = false;
-
     private string selectedPlatform = "LinkedIn";
+
+    // New Modal State Variables
+    private bool showCountdownModal = false;
+    private int countdownTicks = 5;
+    private List<string> AgentTraceLogs = new List<string>();
+
+    private void AddTraceLog(string log)
+    {
+        AgentTraceLogs.Add(log);
+        InvokeAsync(StateHasChanged); // Forces the UI to update instantly
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -129,15 +310,19 @@
         safetyResult = null;
         canPost = false;
         alertClass = "";
+        showGuardianPopup = false;
+        showCountdownModal = false;
+        AgentTraceLogs.Clear();
     }
 
-    // Explicit method to hide the UI the moment they start typing
     private void OnContentChanged(ChangeEventArgs e)
     {
         postContent = e.Value?.ToString() ?? "";
         safetyResult = null;
         canPost = false;
         alertClass = "";
+        showGuardianPopup = false;
+        AgentTraceLogs.Clear();
     }
 
     private async Task AnalyzePost()
@@ -147,22 +332,34 @@
         isScanning = true;
         canPost = false;
         showGuardianPopup = false;
+        showCountdownModal = false;
         safetyResult = null;
         StateHasChanged();
 
-        // 1. UPDATE THE AI INSTRUCTIONS: Tell it when to use "Severe"
         string platformContext = selectedPlatform switch
         {
-            "LinkedIn" => "Professional site. Flag rants as DANGER, but keep RiskLevel 'Moderate'. ONLY return RiskLevel 'Severe' for self-harm, extreme toxicity, or violence.",
+            "LinkedIn" => "Professional networking. Venting or complaining about management is unprofessional. Return Status 'WARNING' and RiskLevel 'Moderate'. NEVER use Severe for venting.",
             "Twitter" => "Fast-paced microblogging. Opinions are common. Flag as Moderate if overly aggressive.",
             "Instagram" => "Highly visual, lifestyle-oriented network.",
             "TikTok" => "Gen-Z focused. Sarcasm and venting are common.",
             _ => "General public platform."
         };
 
-        safetyResult = await SafetyService.AnalyzeAsync(postContent, currentUser, selectedPlatform, platformContext);
+        AgentTraceLogs.Clear();
+
+        // Pass the AddTraceLog method as the callback!
+        safetyResult = await SafetyService.AnalyzeAsync(
+            postContent,
+            currentUser,
+            selectedPlatform,
+            platformContext,
+            AddTraceLog
+        );
 
         isScanning = false;
+        // ✨ DELAY AND CLEAR REMOVED FROM HERE!
+
+        StateHasChanged();
 
         if (safetyResult == null)
         {
@@ -179,23 +376,64 @@
         else
         {
             canPost = false;
-
-            // 2. Make the box RED for Danger, Yellow for Warning
             alertClass = (safetyResult.Status == "DANGER") ? "alert-danger" : "alert-warning";
 
-            // 3. GUARDIAN LOGIC: Only trigger the popup if the AI explicitly returns "Severe"
+            // GUARDIAN LOGIC: Start the timer for severe risks!
             if (safetyResult.RiskLevel?.Equals("Severe", StringComparison.OrdinalIgnoreCase) == true)
             {
-                showGuardianPopup = true;
-            }
-            else
-            {
-                showGuardianPopup = false;
+                await StartCountdownSequence();
             }
         }
 
         StateHasChanged();
     }
+
+    private async Task StartCountdownSequence()
+    {
+        showCountdownModal = true;
+        countdownTicks = 5;
+        StateHasChanged();
+
+        // Count down from 5
+        while (countdownTicks > 0 && showCountdownModal)
+        {
+            await Task.Delay(1000);
+            if (showCountdownModal)
+            {
+                countdownTicks--;
+                StateHasChanged();
+            }
+        }
+
+        // If it hit 0 and wasn't cancelled by the user
+        if (countdownTicks == 0 && showCountdownModal)
+        {
+            showCountdownModal = false;
+
+            // Fire the email!
+            await Governor.BlockAndAlertAsync(postContent, safetyResult?.Reason ?? "Severe Risk Detected");
+
+            safetyResult = null; // Hide the danger box
+            showGuardianPopup = true; // Show the secure alert toast
+            StateHasChanged();
+
+            // Wait 4 seconds, then hide the toast automatically
+            await Task.Delay(4000);
+            showGuardianPopup = false;
+            StateHasChanged();
+        }
+    }
+
+    private void CancelAlert()
+    {
+        // User intervened! Stop the timer.
+        showCountdownModal = false;
+        postContent = ""; // Clear their draft so they don't accidentally send it
+        safetyResult = null; // Hide the danger box
+        alertClass = "";
+        StateHasChanged();
+    }
+
     private void SimulatePost()
     {
         if (safetyResult?.Status != "SAFE") return;
@@ -203,14 +441,13 @@
         alertClass = "alert-safe";
         safetyResult = new SafetyResult
         {
-            Status = "SAFE",
+            Status = "PUBLISHED",
             ConfidenceScore = 100,
             Reason = $"Successfully posted to {selectedPlatform}!",
             Rewrite = "",
-            Action = "Post completed."
+            Action = "View live post."
         };
 
-        postContent = "";
         canPost = false;
     }
 
@@ -219,9 +456,18 @@
         if (safetyResult != null && !string.IsNullOrWhiteSpace(safetyResult.Rewrite))
         {
             postContent = safetyResult.Rewrite;
-            safetyResult = null;
-            canPost = false;
-            alertClass = "";
+            safetyResult = new SafetyResult
+            {
+                Status = "SAFE",
+                ConfidenceScore = 100,
+                Reason = "Text has been updated to the safe, AI-suggested version.",
+                Action = "Ready to publish."
+            };
+
+            canPost = true;
+            alertClass = "alert-safe";
+            showGuardianPopup = false;
+            StateHasChanged();
         }
     }
 }
