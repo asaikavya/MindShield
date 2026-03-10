@@ -58,17 +58,20 @@ MindShield doesn't just pass text to a single LLM. It orchestrates three highly 
   
 ### 📸 MindShield in Action
 
-**Platform Context: LinkedIn vs TikTok**
-![Platform Context](MindShield/assets/platform_rewrite.png)
+**Scenario 1: Platform-Aware Intelligence**
+![Platform Context](MindShield/assets/moderaterisk_platform1.png)
+![Platform Context](MindShield/assets/moderateriskplatform_2.png)
 
 **The Career Coach (Moderate Risk):**
-![Moderate Risk Analysis](MindShield/assets/ModerateRisk.png)
+![Moderate Risk Analysis](MindShield/assets/Moderater_risk_rewrite.png)
+After Click on Use Suggested Rewrite
+![Moderate Risk Analysis](MindShield/assets/Moderaterisk_afterrewrite.png)
 
-**Crisis Detection (Severe Risk):**
-![Severe Risk Analysis](MindShield/assets/Sever_risk.png)
+**Scenario 3: The Governance Agent (Severe Risk)**
+![Severe Risk Analysis](MindShield/assets/garudianalert_forpersonal.png)
 
 **The Guardian Protocol:**
-![Guardian Mail Alert](MindShield/assets/gaurdianmailalert.png)
+![Guardian Mail Alert](MindShield/assets/gaurdian_emailalert.png)
 
 ## 🏗️ Technical Stack (AI Dev Days Hero Tech)
 
