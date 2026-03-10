@@ -13,50 +13,48 @@ MindShield solves this. It's the **pause button** you wish you always had.
 Three converging trends make MindShield especially relevant today:
 
 + **Digital Permanence Despite Deletion**: While users can delete social media posts, the internet rarely forgets. Content can be screenshotted, archived, or reshared within seconds. In many cases, the reputational damage happens before the original post is removed, making prevention more valuable than cleanup.
-+ **The Agentic AI Breakthrough:** Traditional moderation tools relied on simple keyword filters that often missed context. Today, using the **Microsoft Agent Framework** and models routed through **Microsoft Foundry**, we can orchestrate specialized AI agents that understand nuance, tone, sarcasm, and platform-specific expectations.
-+ **Growing Corporate Compliance Pressure:** Organizations face increasing reputational and regulatory risks tied to employee social media activity. Companies need proactive, immutable audit trails to prevent brand-damaging posts before they happen.
++ **The Agentic AI Breakthrough:** Traditional moderation tools relied on simple keyword filters that often missed context. Today, using the **Microsoft Agent Framework**, we can orchestrate specialized AI agents that understand nuance, tone, sarcasm, and platform-specific expectations..
++ **Corporate Compliance Pressure** :Organizations face increasing reputational and regulatory risks tied to employee social media activity. Companies need proactive, immutable audit trails to prevent brand-damaging posts before they happen.
 
-## ✨ What Makes MindShield Different
+## ✨ What Makes MindShield Different: A Multi-Agent Architecture
+MindShield doesn't just pass text to a single LLM. It orchestrates three highly specialized agents to evaluate intent, preserve authenticity, and trigger interventions:
 
 ### 🤖 Agentic Tiered Analysis
-MindShield doesn't just flag keywords—it orchestrates intelligent agents to evaluate intent and platform nuances. Using the **Microsoft Agent Framework** and **Azure OpenAI (GPT-4o)** managed via **Microsoft Foundry**, it deploys specialized agents to categorize content:
-* **Safe:** Professional or harmless casual updates.
-* **Moderate:** Unprofessional, aggressive, or "cringe" content.
-* **Severe:** Dangerous, delusional, or high-risk identity claims (e.g., impersonation).
+
++ **The Classifier Agent (Context & Routing)**: Evaluates risk differently for LinkedIn, X/Twitter, Instagram, and TikTok. It understands that a "hot take" acceptable on X might be career suicide on LinkedIn.
+
++ **The Coaching Agent (Anti-Robot Rewrites)**: Engages during "Moderate" risks. It suggests professional rewrites that preserve the user’s authentic voice and frustration, stripping out the fireable offenses without sounding like a corporate robot.
+
++ **The Governance Agent (Crisis & Compliance)**: Engages during "Severe" risks (e.g., Insider Trading or self-harm). It completely blocks the post and triggers a secure email alert to a user-designated Guardian.
 
 ## 🚀 Key Features
 
-* **🌐 Multi-Platform Context Engine:** Evaluates risk differently for LinkedIn, X/Twitter, Instagram, and TikTok. The AI understands that a "hot take" acceptable on X might be a reputation risk on LinkedIn.
-* **✍️ Smart Intervention Logic (Coaching Agent):**
-  * **For Moderate Risk:** The Coaching Agent suggests a professional rewrite that preserves the user’s intent while improving tone and clarity.
-    > **Original:** “My manager has no idea what they're doing.” <br>
-    > **Rewritten:** “I’ve been reflecting on leadership challenges at work and how communication can improve team effectiveness.”
-  * **For Severe Risk (Governance Agent):** The system BLOCKS the post entirely and triggers a **Guardian Notification**.
-* **🚨 Real-Time Guardian Alerts:** Integrated with SMTP/Email services, the system bypasses the user to send an immediate, high-priority HTML alert to a trusted contact (e.g., family or mentor) when severe risk is detected.
-* **📊 Confidence Scoring:** Provides a transparency layer (e.g., 92% Confidence) for every assessment, surfacing the AI's certainty to the user.
+* **Real-Time Agent Trace Panel**: MindShield is a "glass box," not a black box. The UI features a live terminal streaming the multi-agent handoffs in real-time, proving exactly how the AI made its decision
+* ⏳**5-Second "Break Glass" Intervention**: When Severe risk is detected, the UI locks down and initiates a 5-second countdown before notifying compliance or family, giving the user a final chance to cancel and regain control
 * **🧠 Hybrid AI Architecture:** Powered by Azure AI Foundry (GPT-4o) for high-fidelity analysis, with Ollama (Phi-3) fallback support for privacy-first offline usage.
 * **💻 Glassmorphism Dashboard:** A high-performance Blazor Interactive Server UI featuring real-time scanning states and a modern, adaptive design.
 
 ## 📊 Real-World Impact
 
-**Example 1: High-Risk Intervention**
-* **User post:** "I have chip in my brain"
-* **Detection:** 🔴 SEVERE (Self-harm/delusional language)
-* **Action:** POST BLOCKED
-* **Guardian Alert:** Email sent to family member:
-  > **Subject:** 🚨 URGENT: MindShield Intervention Alert
-  > "A severe risk social media post was intercepted and blocked by MindShield.
-  > **Flagged Reason:** High-risk delusional or self-harm language detected.
-  > **Intercepted Draft:** 'i have chip in my brain'
-  > Please reach out to check in."
+🟢 **Scenario 1: The "Hype" False Positive**
 
-### 📱 Platform-Aware Intelligence
-*Same post, different platforms = different risk levels*
-**Post:** "I'm done with my job"
-* 💼 **LinkedIn:** 🔴 SEVERE (Career suicide on professional network)
-* 𝕏 **Twitter:** 🟡 MODERATE (Venting is normal, but could go viral)
-* 📸 **Instagram:** 🟢 SAFE (Personal account, venting is acceptable)
-* 🎵 **TikTok:** 🟢 SAFE (Audience expects casual opinions)
++ **User Types**: "My company's stock is about to go through the roof 🚀"
+
++ **Agent Decision**: **SAFE**. The Classifier Agent recognizes this as standard marketing hype, not an SEC violation, proving semantic intelligence over basic keyword matching.
+
+🟡 **Scenario 2: The Authentic Coach**
+
++ **User Types**: "Just sat through another meeting where my boss took credit for my work." (Target: LinkedIn)
++ **Agent Decision**: **MODERATE**.
++ **Action**: The Coaching Agent kicks in and offers a rewrite: "Just wrapped another meeting where it felt like my contributions got brushed aside. Keeping a smile, but man, it's tough." The user's frustration is validated, but the public attack is removed.
+
+🚨 **Scenario 3: The Crisis Override**
+
+**User Types:** "Can't do this anymore. Done with everything."
+
+**Agent Decision**: **SEVERE**.
+
++ **Action**: Bypasses all platform context. The 5-second countdown initiates. The Governance Agent sends a secure check-in alert to the user's designated emergency contact (e.g., Wife).
   
 ### 📸 MindShield in Action
 
@@ -82,33 +80,30 @@ MindShield doesn't just flag keywords—it orchestrates intelligent agents to ev
 | **Backend** | .NET 10 / C# |
 | **Database & Cloud** | Azure SQL / Entity Framework Core / Azure App Service ready |
 
-## 🏗️ Architecture
-
-The application hosts a Blazor front-end and an application service layer in the same process. Services call **Microsoft Foundry pipelines** and leverage the **Microsoft Agent Framework** to orchestrate Azure OpenAI models and deterministic rules. Outcomes are stored in an Azure-ready SQL database and surfaced in the UI.
+## 🏗️ Multi-Agent Flowchart
 
 ```mermaid
 flowchart TD
     Start([User Drafts Post]) --> Input[/Content + Platform Context/]
-    Input --> AgentFramework{Microsoft Agent Framework / Foundry}
+    Input --> Classifier{Classifier Agent}
 
-    AgentFramework -->|Safe| SafeResult[✅ SAFE]
-    AgentFramework -->|Moderate| WarnResult[🟡 WARNING]
-    AgentFramework -->|Severe| DangerResult[🔴 DANGER]
-
-    SafeResult --> Publish([Allow Post to Platform])
+    Classifier -->|Safe| Publish([Allow Post to Platform])
     
-    WarnResult --> Rewrite[Coaching Agent Suggests Professional Rewrite]
+    Classifier -->|Moderate| Coach[Coaching Agent]
+    Coach --> Rewrite[Suggests Authentic Rewrite]
     Rewrite --> UserChoice{User Accepts?}
     UserChoice -->|Yes| Publish
     UserChoice -->|No| Start
 
-    DangerResult --> Block[🚫 POST BLOCKED]
-    Block --> Alert[Governance Agent Sends Guardian Alert]
-    Alert --> Support([Intervention Required])
+    Classifier -->|Severe| Governor[Governance Agent]
+    Governor --> Block[🚫 POST BLOCKED]
+    Block --> Timer{5-Second User Override}
+    Timer -->|User Cancels| Start
+    Timer -->|Timer Expires| Alert[Send Guardian SMTP Alert]
 
-    style SafeResult fill:#d4edda,stroke:#28a745
-    style WarnResult fill:#fff3cd,stroke:#ffc107
-    style DangerResult fill:#f8d7da,stroke:#dc3545
+    style Publish fill:#d4edda,stroke:#28a745
+    style Coach fill:#fff3cd,stroke:#ffc107
+    style Governor fill:#f8d7da,stroke:#dc3545
     style Block fill:#f8d7da,stroke:#dc3545,stroke-width:4px
 ```
 **Team** <br>
@@ -139,19 +134,30 @@ Note: By default, draft content is not permanently stored. Optional redacted or 
   + **High-Profile Executives**: Provides a necessary friction layer to prevent impulsive, late-night posts from impacting stock prices or public relations.
 
 ## 🗺️ Future Roadmap
-The current hackathon build proves the viability of the Semantic Kernel tiered-risk engine. The next phases of development focus on frictionless UX and enterprise integrations:
-+ **Frictionless Interception (UX)**: Moving away from a standalone dashboard by packaging the .NET logic into a **Browser Extension** and a **Mobile Keyboard API.** This will allow MindShield to passively scan text boxes natively within the LinkedIn or X apps.<br>
-+ **Notification Extensibility:** The architecture utilizes an IGuardianNotificationService interface. While the prototype uses SMTP Email, this dependency-injected design allows for rapid integrations with **Slack Webhooks, Microsoft Teams Alerts, or Twilio SMS** for instant corporate compliance alerts.<br>
-+ **Custom "Reality Profiles"**: Allowing enterprise organizations to train the AI on their specific corporate guidelines and employee handbooks via Azure AI Search (RAG).
+The current hackathon build successfully proves the viability of a Multi-Agent risk-routing engine. To scale MindShield into a ubiquitous enterprise safety net, the development roadmap is structured into three strategic phases:
+
+📍 **Phase 1: Point-of-Creation Integration (UX)**
+Currently, MindShield operates as a standalone dashboard. The next step is frictionless, invisible integration where the user already works.
+  + **Enterprise Browser Extension**: Packaging the .NET logic into a Chrome/Edge extension to passively evaluate text natively within linkedin.com or x.com text boxes.
+  + **Mobile Keyboard API**: Developing an iOS/Android custom keyboard extension to intercept and evaluate content before it is submitted to any social application.
+
+📍 **Phase 2: Enterprise Ecosystem Hooks (Extensibility)**
+The architecture currently utilizes an IGuardianNotificationService interface with an SMTP email implementation. Phase 2 expands this to fit modern corporate workflows.
+  + **Instant Chat Integrations**: Adding dependency-injected services for Microsoft Teams Alerts and Slack Webhooks.
+  + **SMS Escalation:** Integrating Twilio SMS for immediate, high-priority SEC violation alerts (MNPI leaks).
+  + **Role-Based Routing:** Routing "Moderate" coaching moments to HR, while instantly escalating "Severe" data leaks directly to SecOps.
+
+📍 **Phase 3: Corporate RAG & Hyper-Personalization (AI)**
+Moving from general safety guidelines to company-specific compliance.
++ **Custom "Reality Profiles":** Utilizing Azure AI Search (RAG) to ingest specific corporate employee handbooks, PR guidelines, and SEC compliance rules.
++ **Dynamic Agent Context:** Feeding this localized RAG data directly into the Classifier Agent, allowing the AI to enforce Company A's specific NDA rules rather than relying solely on generalized LLM knowledge.
 
 ## 🔒Privacy & Responsible AI
-MindShield is designed with responsible AI principles:<br>
-  + Human override on all actions<br>
-  + Transparent confidence scoring<br>
-  + No autonomous posting<br>
-  + Configurable data retention<br>
-  + Secure secret management via environment variables and Key Vault<br>
-  + Guardian alerts are **user-configured — no default surveillance**
++ MindShield is designed with responsible AI principles:
++ Human override on all actions (The 5-second cancel window).
++ Transparent trace logs detailing exactly how the AI made its decision.
++ No autonomous posting.
++ Guardian alerts are user-configured — **no default surveillance.**
 
 ## 🛠️ Setup (Developer)
 **Prerequisites**
