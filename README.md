@@ -96,6 +96,9 @@ After clicking "Use Suggested Rewrite":
 **Scenario 3: The Governance Agent (Severe Risk)**
 ![Guardian Alert](MindShield/assets/garudianalert_forpersonal.png)
 
+**The Guardian Email Alert:**
+![Guardian Email Alert](MindShield/assets/guardian_emailalert.png)
+
 ---
 
 ## 🏗️ Technical Stack (AI Dev Days Hero Tech)
