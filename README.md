@@ -27,13 +27,15 @@ Just as `git diff` shows you what you're about to push to a repository, MindShie
 
 We live in an era of digital permanence. A thoughtless tweet. An angry comment. A cringe-worthy post. These moments — seconds to create, instantly public — can shape careers, damage relationships, and define reputations for years.
 
+While users can delete a post after the fact, the internet is permanent. A damaging post live for even a few seconds can be screenshotted or archived by bots, making reactive deletion no longer a viable safety net. Social media platforms encourage instant sharing but rarely provide tools that help users pause and reconsider before publishing potentially harmful content.
+
 MindShield solves this. It's the **pause button you wish you always had.**
 
 **⏱️ Why Now?**
 
 Three converging trends make MindShield especially relevant today:
 
-+ **Digital Permanence Despite Deletion**: While users can delete social media posts, the internet rarely forgets. Content can be screenshotted, archived, or reshared within seconds. In many cases, the reputational damage happens before the original post is removed, making prevention more valuable than cleanup.
++ **Digital Permanence Despite Deletion**: Content can be screenshotted, archived, or reshared within seconds. In many cases, the reputational damage happens before the original post is removed, making prevention more valuable than cleanup.
 + **The Agentic AI Breakthrough**: Traditional moderation tools relied on simple keyword filters that often missed context. Today, using the **Microsoft Agent Framework**, we can orchestrate specialized AI agents that understand nuance, tone, sarcasm, and platform-specific expectations.
 + **Corporate Compliance Pressure**: Organizations face increasing reputational and regulatory risks tied to employee social media activity. Companies need proactive, immutable audit trails to prevent brand-damaging posts before they happen.
 
@@ -48,12 +50,21 @@ No. MindShield is an **active seatbelt, not a security camera.** It coaches the 
 
 **Where does the data go?**
 
-+ **Draft content is never stored by default.** What you type stays between you and the AI analysis — it is never persisted to the database.
-+ **Only risk metadata is saved**: platform, risk classification, AI confidence score, and intervention action. Never the raw post content.
-+ **Guardian email alerts are entirely user-configured.** MindShield has no default surveillance. You choose your guardian, and you can cancel any alert within the 5-second override window.
-+ **Offline privacy mode**: MindShield's **Ollama/Phi-3 fallback** runs semantic analysis entirely on local hardware, making it viable for **air-gapped enterprise environments** and privacy-first deployments.
+Three privacy principles enforced by design, not just policy:
 
-*These principles are enforced by design, not just policy.*
++ **Draft content is never stored.** What you type stays between you and the AI — it is never written to the database. Ever.
++ **Guardian email alerts are entirely user-configured.** MindShield has no default surveillance. You choose your guardian, and you can cancel any alert within the 5-second override window.
++ **Offline privacy mode is fully supported.** MindShield's Ollama/Phi-3 fallback runs semantic analysis entirely on local hardware, making it viable for air-gapped enterprise environments and privacy-first deployments.
+
+**What IS persisted (audit trail only):**
++ Platform metadata & risk classification
++ AI confidence score & intervention action taken
++ Guardian notification status (true/false)
+
+**What is NEVER persisted:**
++ Draft post content
++ Rewrite suggestions
++ Any raw text the user typed
 
 ---
 
@@ -76,6 +87,7 @@ MindShield doesn't just pass text to a single LLM. It orchestrates three highly 
 * **Real-Time Agent Trace Panel**: MindShield is a "glass box," not a black box. The UI features a live terminal streaming the multi-agent handoffs in real-time, proving exactly how the AI made its decision.
 * **⏳ 5-Second "Break Glass" Intervention**: When Severe risk is detected, the UI locks down and initiates a 5-second countdown before notifying compliance or family — giving the user a final chance to cancel and regain control. **No action ever happens without the user's knowledge.**
 * **🧠 Hybrid AI Architecture**: Powered by Azure AI Foundry (GPT-4o) for high-fidelity analysis, with Ollama (Phi-3) fallback support for privacy-first, fully offline, air-gapped enterprise usage.
+* **🗄️ Compliance Audit Trail**: Every scan outcome is persisted to Azure SQL — platform, risk level, confidence score, and action taken — without ever storing the raw post content. A provable compliance record, not just a claim.
 * **💻 Glassmorphism Dashboard**: A high-performance Blazor Interactive Server UI featuring real-time scanning states and a modern, adaptive design.
 
 ---
@@ -91,7 +103,7 @@ MindShield doesn't just pass text to a single LLM. It orchestrates three highly 
 
 + **User Types**: "My boss is so annoying, I can't stand this job" (Target: LinkedIn)
 + **Agent Decision**: **MODERATE**.
-+ **Action**: The Coaching Agent kicks in and offers a rewrite: *"This job is so frustrating sometimes, and it feels like I'm constantly hitting roadblocks."* The user's frustration is validated, but the personal attack is removed.
++ **Action**: The Coaching Agent suggests a rewrite: *"This job is so frustrating sometimes, and it feels like I'm constantly hitting roadblocks."* The user's frustration is validated, but the personal attack is removed.
 + **Switch to TikTok**: The exact same post returns **SAFE** — because venting is culturally acceptable on casual platforms.
 
 🚨 **Scenario 3: The Crisis Override**
@@ -104,23 +116,23 @@ MindShield doesn't just pass text to a single LLM. It orchestrates three highly 
 
 ### 📸 MindShield in Action
 
-**Scenario 1: Safe — Platform-Aware Intelligence**
+**Scenario 1: Safe — Semantic Intelligence Over Keyword Matching**
 ![Safe Result](MindShield/assets/safe.png)
 
-**Scenario 2: Platform Context (Same Text, Different Result)**
+**Scenario 2: Platform Context — Same Text, Different Result**
 ![LinkedIn Moderate](MindShield/assets/platform_linkedin.png)
 ![Twitter Safe](MindShield/assets/platform_twitter.png)
 
-**Scenario 2: The Career Coach (Moderate Risk Rewrite)**
+**The Career Coach — Moderate Risk Rewrite**
 ![Moderate Risk Analysis](MindShield/assets/Moderater_risk_rewrite.png)
 
 After clicking "Use Suggested Rewrite":
 ![Moderate Risk After Rewrite](MindShield/assets/Moderaterisk_afterrewrite.png)
 
-**Scenario 3: The Governance Agent (Severe Risk)**
+**Scenario 3: The Governance Agent — Severe Risk**
 ![Severe Risk Analysis](MindShield/assets/garudianalert_forpersonal.png)
 
-**The Guardian Email Alert:**
+**The Guardian Email Alert**
 ![Guardian Email Alert](MindShield/assets/guardian_emailalert.png)
 
 ---
@@ -144,17 +156,20 @@ flowchart TD
     Start([User Drafts Post]) --> Input[/Content + Platform Context/]
     Input --> Classifier{Classifier Agent}
 
-    Classifier -->|Safe| Publish([Allow Post to Platform])
+    Classifier -->|Safe| Audit1[Save to AuditLog]
+    Audit1 --> Publish([Allow Post to Platform])
     
     Classifier -->|Moderate| Coach[Coaching Agent]
     Coach --> Rewrite[Suggests Authentic Rewrite]
-    Rewrite --> UserChoice{User Accepts?}
+    Rewrite --> Audit2[Save to AuditLog]
+    Audit2 --> UserChoice{User Accepts?}
     UserChoice -->|Yes| Publish
     UserChoice -->|No| Start
 
     Classifier -->|Severe| Governor[Governance Agent]
     Governor --> Block[🚫 POST BLOCKED]
-    Block --> Timer{5-Second User Override}
+    Block --> Audit3[Save to AuditLog]
+    Audit3 --> Timer{5-Second User Override}
     Timer -->|User Cancels| Start
     Timer -->|Timer Expires| Alert[Send Guardian SMTP Alert]
 
@@ -173,12 +188,15 @@ flowchart TD
 
 MindShield uses SQL Server with Entity Framework Core to store structured, auditable outcomes. This transforms the app from a simple demo into a compliance-ready decision engine.
 
-**What Is Persisted:**
-+ Platform metadata & Risk classification
-+ AI confidence score & Intervention action
+**What Is Persisted (ScanAuditLogs table):**
++ Platform metadata & risk classification
++ AI confidence score & intervention action
 + Guardian notification status
 
-> **Note:** Draft content is **never** permanently stored. Only anonymized risk metadata is persisted by default.
+**What Is Never Persisted:**
++ Draft post content
++ Rewrite suggestions
++ Any raw text the user typed
 
 **Why Persistence Matters:**
 + **Enables audit trails** for corporate compliance.
@@ -202,7 +220,7 @@ While MindShield acts as a personal safety net, its true value lies in Corporate
 ## 🗺️ Future Roadmap
 
 📍 **Phase 1: Point-of-Creation Integration (UX)**
-+ **Enterprise Browser Extension**: Packaging the .NET logic into a Chrome/Edge extension to passively evaluate text natively within linkedin.com or x.com text boxes.
++ **Enterprise Browser Extension**: Packaging the .NET logic into a Chrome/Edge extension to evaluate text natively within linkedin.com or x.com text boxes.
 + **Mobile Keyboard API**: Developing an iOS/Android custom keyboard extension to intercept and evaluate content before it is submitted to any social application.
 
 📍 **Phase 2: Enterprise Ecosystem Hooks (Extensibility)**
@@ -238,15 +256,13 @@ MindShield is designed from the ground up with responsible AI at its core:
 + Azure OpenAI access (endpoint, key, and deployment name)
 + (Optional) Ollama with Phi-3 for offline/local fallback
 
-**Local Setup (Hybrid AI Support)**
-MindShield is designed to run either on the cloud (Azure OpenAI) or completely offline (Ollama) depending on your configuration.
+**Local Setup**
 
 1. **Clone the repository** and open a terminal at the solution root.
 2. **Configure the AI Brain (Choose Cloud or Local):**
    * **Option A (Azure OpenAI - Primary):** Edit `MindShield/MindShield.Web/appsettings.json` and set `AzureOpenAI:Endpoint`, `AzureOpenAI:ApiKey`, and `AzureOpenAI:DeploymentName`.
-   * **Option B (Ollama - Offline Fallback):** Leave the Azure keys blank. Ensure you have Ollama installed and running locally with the Phi-3 model pulled (`ollama run phi3`). The app will automatically route requests to `localhost:11434`.
-3. **Verify database connection:**
-   - Ensure `ConnectionStrings:DefaultConnection` points to a reachable SQL instance.
+   * **Option B (Ollama - Offline Fallback):** Leave the Azure keys blank. Ensure Ollama is installed and running with Phi-3 pulled (`ollama run phi3`). The app automatically routes to `localhost:11434`.
+3. **Verify database connection** in `ConnectionStrings:DefaultConnection`.
 4. **Configure Guardian Email (SMTP):**
    ```bash
    cd MindShield/MindShield.Web
@@ -262,13 +278,13 @@ MindShield is designed to run either on the cloud (Azure OpenAI) or completely o
    ```bash
    dotnet run
    ```
-7. **View the app**: Open a browser at the URL printed by the host (typically `https://localhost:5xxx`).
+7. **View the app** at the URL printed by the host (typically `https://localhost:5xxx`).
 
 ---
 
 ## 📝 Notes & License
 
-**Notes:** Ensure your API keys are kept out of source control. Use environment variables, user-secrets, or Azure Key Vault for cloud deployments.
+**Notes:** Keep API keys out of source control. Use environment variables, user-secrets, or Azure Key Vault for cloud deployments.
 
 **License & Contribution:** This repository is a hackathon demo. Contributions are welcome; please avoid committing sensitive credentials.
 
