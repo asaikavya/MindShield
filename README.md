@@ -78,21 +78,23 @@ MindShield doesn't just pass text to a single LLM. It orchestrates three highly 
 
 ### 📸 MindShield in Action
 
-**Scenario 1: Platform-Aware Intelligence**
-![Platform Context](MindShield/assets/moderaterisk_platform1.png)
-![Platform Context](MindShield/assets/moderateriskplatform_2.png)
+### 📸 MindShield in Action
 
-**The Career Coach (Moderate Risk):**
+**Scenario 1: Safe — Platform-Aware Intelligence**
+![Safe Result](MindShield/assets/safe.png)
+
+**Scenario 2: Platform Context (Same Text, Different Result)**
+![LinkedIn Moderate](MindShield/assets/platform_linkedin.png)
+![Twitter Safe](MindShield/assets/platform_twitter.png)
+
+**Scenario 2: The Career Coach (Moderate Risk Rewrite)**
 ![Moderate Risk Analysis](MindShield/assets/Moderater_risk_rewrite.png)
 
 After clicking "Use Suggested Rewrite":
-![Moderate Risk Analysis](MindShield/assets/Moderaterisk_afterrewrite.png)
+![Moderate Risk After Rewrite](MindShield/assets/Moderaterisk_afterrewrite.png)
 
 **Scenario 3: The Governance Agent (Severe Risk)**
-![Severe Risk Analysis](MindShield/assets/garudianalert_forpersonal.png)
-
-**The Guardian Protocol:**
-![Guardian Mail Alert](MindShield/assets/gaurdian_emailalert.png)
+![Guardian Alert](MindShield/assets/garudianalert_forpersonal.png)
 
 ---
 
