@@ -78,8 +78,6 @@ MindShield doesn't just pass text to a single LLM. It orchestrates three highly 
 
 ### 📸 MindShield in Action
 
-### 📸 MindShield in Action
-
 **Scenario 1: Safe — Platform-Aware Intelligence**
 ![Safe Result](MindShield/assets/safe.png)
 
@@ -95,7 +93,8 @@ After clicking "Use Suggested Rewrite":
 
 **Scenario 3: The Governance Agent (Severe Risk)**
 ![Guardian Alert](MindShield/assets/garudianalert_forpersonal.png)
-**The Guardian Email Alert:**
+
+The Guardian Email Alert:
 ![Guardian Email Alert](MindShield/assets/gaurdian_emailalert.png)
 
 
