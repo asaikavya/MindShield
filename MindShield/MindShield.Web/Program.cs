@@ -27,7 +27,7 @@ builder.Services.AddDbContext<MindShieldDbContext>(options =>
 builder.Services.AddScoped<IGuardianNotificationService, EmailGuardianService>();
 // 4. Add Background Workers
 builder.Services.AddHostedService<LinkedInGuardianWorker>();
-builder.Services.AddScoped<ISafetyService, MindShieldSafetyService>();
+
 
 // 3. Add Semantic Kernel (THE AI BRAIN) 🧠
 // We create the builder first
