@@ -11,6 +11,7 @@ namespace MindShield.Web
         }
 
         public DbSet<RealityProfile> RealityProfiles { get; set; }
+        public DbSet<ScanAuditLog> ScanAuditLogs { get; set; }
 
         // --- THE FIX IS HERE ---
         // We added "internal" to match the base class signature

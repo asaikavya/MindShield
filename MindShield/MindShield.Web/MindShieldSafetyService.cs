@@ -20,16 +20,19 @@ namespace MindShield.Web.Services
         private readonly IClassifierAgent _classifier;
         private readonly ICoachingAgent _coach;
         private readonly IGovernanceAgent _governor;
+        private readonly MindShieldDbContext _db;
 
         // DI Injects the Agents
-        public MindShieldSafetyService(IClassifierAgent classifier, ICoachingAgent coach, IGovernanceAgent governor)
+        public MindShieldSafetyService(IClassifierAgent classifier, ICoachingAgent coach, IGovernanceAgent governor, MindShieldDbContext db)
         {
             _classifier = classifier;
             _coach = coach;
             _governor = governor;
+            _db = db;
         }
 
-        public async Task<SafetyResult> AnalyzeAsync(string content, RealityProfile profile, string platform, string platformContext, Action<string> onTrace = null)
+        public async Task<SafetyResult> AnalyzeAsync(string content, 
+            RealityProfile profile, string platform, string platformContext, Action<string> onTrace = null)
         {
             onTrace?.Invoke("> System: Initializing MindShield Multi-Agent Pipeline...");
             await Task.Delay(500);
@@ -47,35 +50,66 @@ namespace MindShield.Web.Services
             if (result.RiskLevel == "Severe")
             {
                 onTrace?.Invoke("> GovernanceAgent: SEVERE risk detected. Preparing intervention protocol.");
+                await SaveAuditLog(profile, platform, result, guardianAlerted: true);  
                 return result;
+              
             }
             else if (result.RiskLevel == "Moderate")
             {
                 onTrace?.Invoke("> CoachingAgent: MODERATE risk. Rewriting to preserve natural voice...");
                 var coachedResult = await _coach.RewriteAsync(content, result.Reason, result);
                 onTrace?.Invoke("> CoachingAgent: Rewrite complete.");
+                await SaveAuditLog(profile, platform, coachedResult, rewriteSuggested: true); 
                 return coachedResult;
             }
 
             onTrace?.Invoke("> System: Content cleared for publishing.");
+            await SaveAuditLog(profile, platform, result);
             return result;
+        }
+        private async Task SaveAuditLog(
+    RealityProfile profile,
+    string platform,
+    SafetyResult result,
+    bool rewriteSuggested = false,
+    bool guardianAlerted = false)
+        {
+            try
+            {
+                var log = new ScanAuditLog
+                {
+                    UserId = profile.UserId,
+                    Platform = platform,
+                    RiskLevel = result.RiskLevel,
+                    Status = result.Status,
+                    ConfidenceScore = result.ConfidenceScore,
+                    Reason = result.Reason,
+                    Action = result.Action,
+                    RewriteSuggested = rewriteSuggested,
+                    GuardianAlerted = guardianAlerted,
+                    ScannedAt = DateTime.UtcNow
+                };
+
+                _db.ScanAuditLogs.Add(log);
+                await _db.SaveChangesAsync();
+
+                Console.WriteLine($"[AuditLog] Saved: {platform} | {result.RiskLevel} | Guardian: {guardianAlerted}");
+            }
+            catch (Exception ex)
+            {
+                // Never let audit logging break the main scan flow
+                Console.WriteLine($"[AuditLog] Save failed silently: {ex.Message}");
+            }
         }
 
         private string GetBehavioralContext(bool isDemoMode = false)
         {
             return "Normal baseline behavior.";
-
-            /* Original behavioral context logic — uncomment for live demo Test Case 4:
-             *
-             * var flags = new List<string>();
-             * int currentHour = isDemoMode ? 3 : DateTime.Now.Hour;
-             * if (currentHour >= 22 || currentHour <= 5) flags.Add("Late-night posting detected.");
-             * int recentSevere = isDemoMode ? 2 : 0;
-             * if (recentSevere >= 2) flags.Add("Escalating risk pattern.");
-             * return flags.Count > 0 ? string.Join(" | ", flags) : "Normal baseline behavior.";
-             */
         }
-    }
+}
+
+   
+    
 
     public class ClassifierAgent : IClassifierAgent
     {
