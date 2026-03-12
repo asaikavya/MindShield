@@ -136,6 +136,10 @@ After clicking "Use Suggested Rewrite":
 ![Guardian Email Alert](MindShield/assets/guardian_emailalert.png)
 
 ---
+## 🏗️ Architecture
+![MindShield Architecture](assets/architecture-diagram.png)
+
+---
 
 ## 🏗️ Technical Stack (AI Dev Days Hero Tech)
 
