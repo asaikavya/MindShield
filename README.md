@@ -136,8 +136,19 @@ After clicking "Use Suggested Rewrite":
 ![Guardian Email Alert](MindShield/assets/gaurdian_emailalert.png)
 
 ---
-## 🏗️ Architecture
+## 🏗️ Architecture & Hero Technologies
+
 ![MindShield Architecture](MindShield/assets/architecture-diagram.png)
+
+MindShield was built from the ground up to leverage the Microsoft AI ecosystem:
+
+* **Microsoft Agent Framework:** Orchestrates our multi-agent pipeline. We utilize dedicated agents for routing (Classifier), rewriting (Coaching), and compliance enforcement (Governance), proving complex agentic collaboration over simple chat-completions.
+* **Azure AI Foundry (GPT-4o):** Powers the semantic intelligence behind our risk evaluations, using strict temperature controls and JSON structured outputs for deterministic, enterprise-grade reliability.
+* **GitHub Copilot Agent Mode:** Served as a core development partner. Copilot was heavily utilized to:
+  * Generate the boilerplate Entity Framework Core migrations and models for the `ScanAuditLogs`.
+  * Scaffold the Blazor Glassmorphism UI components and CSS styling.
+  * Rapidly write the C# unit tests for the multi-agent routing logic.
+* **Azure App Service & Azure SQL:** Provides the cloud-native, secure hosting environment and immutable audit trail database required for a true enterprise compliance tool.
 
 ---
 
