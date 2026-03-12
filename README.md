@@ -136,7 +136,7 @@ After clicking "Use Suggested Rewrite":
 ![Guardian Email Alert](MindShield/assets/gaurdian_emailalert.png)
 
 ---
-## 🏗️ Architecture & Hero Technologies
+## 🏗️ Architecture & Microsoft AI Stack
 
 ![MindShield Architecture](MindShield/assets/architecture-diagram.png)
 
