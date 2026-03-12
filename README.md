@@ -133,11 +133,11 @@ After clicking "Use Suggested Rewrite":
 ![Severe Risk Analysis](MindShield/assets/garudianalert_forpersonal.png)
 
 **The Guardian Email Alert**
-![Guardian Email Alert](MindShield/assets/guardian_emailalert.png)
+![Guardian Email Alert](MindShield/assets/gaurdian_emailalert.png)
 
 ---
 ## 🏗️ Architecture
-![MindShield Architecture](assets/architecture-diagram.png)
+![MindShield Architecture](MindShield/assets/architecture-diagram.png)
 
 ---
 
