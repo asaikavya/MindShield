@@ -1,5 +1,7 @@
 # MindShield: Professional Reputation Guardian 🛡️
 
+> **MindShield scans your social media drafts with a multi-agent AI pipeline before you post — catching career-ending content in real time.**
+
 **MindShield** is an AI-driven safety net for social media, built for the **Microsoft AI Dev Days Hackathon**. Powered by the **Microsoft Agent Framework**, **Microsoft Foundry**, and developed using **GitHub Copilot**.
 
 ---
@@ -117,25 +119,40 @@ MindShield doesn't just pass text to a single LLM. It orchestrates three highly 
 ### 📸 MindShield in Action
 
 **Scenario 1: Safe — Semantic Intelligence Over Keyword Matching**
+
 ![Safe Result](MindShield/assets/safe.png)
+*The Classifier Agent correctly identifies marketing enthusiasm vs. an SEC violation — proving context-aware analysis beyond simple keyword filtering.*
 
 **Scenario 2: Platform Context — Same Text, Different Result**
+
 ![LinkedIn Moderate](MindShield/assets/platform_linkedin.png)
+*The same post flagged as Moderate risk on LinkedIn...*
+
 ![Twitter Safe](MindShield/assets/platform_twitter.png)
+*...returns Safe on X/Twitter, where casual venting is culturally accepted.*
 
 **The Career Coach — Moderate Risk Rewrite**
+
 ![Moderate Risk Analysis](MindShield/assets/Moderater_risk_rewrite.png)
+*The Coaching Agent suggests an authentic rewrite that preserves the user's voice while removing the fireable offense.*
 
 After clicking "Use Suggested Rewrite":
+
 ![Moderate Risk After Rewrite](MindShield/assets/Moderaterisk_afterrewrite.png)
+*The rewritten post is populated back into the draft, ready to publish.*
 
 **Scenario 3: The Governance Agent — Severe Risk**
+
 ![Severe Risk Analysis](MindShield/assets/garudianalert_forpersonal.png)
+*A potential mental health crisis triggers the 5-second countdown. The user retains full cancel control.*
 
 **The Guardian Email Alert**
+
 ![Guardian Email Alert](MindShield/assets/gaurdian_emailalert.png)
+*A secure, user-configured email alert sent to the designated Guardian after the override window expires.*
 
 ---
+
 ## 🏗️ Architecture & Microsoft AI Stack
 
 ![MindShield Architecture](MindShield/assets/architecture-diagram.png)
@@ -144,7 +161,7 @@ MindShield was built from the ground up to leverage the Microsoft AI ecosystem:
 
 * **Microsoft Agent Framework:** Orchestrates our multi-agent pipeline. We utilize dedicated agents for routing (Classifier), rewriting (Coaching), and compliance enforcement (Governance), proving complex agentic collaboration over simple chat-completions.
 * **Azure AI Foundry (GPT-4o):** Powers the semantic intelligence behind our risk evaluations, using strict temperature controls and JSON structured outputs for deterministic, enterprise-grade reliability.
-* **GitHub Copilot Agent Mode:** Served as a core development partner. Copilot was heavily utilized to:
+* **GitHub Copilot Agent Mode:** Served as a core development partner — and a force multiplier for a solo build. Copilot was heavily utilized to:
   * Generate the boilerplate Entity Framework Core migrations and models for the `ScanAuditLogs`.
   * Scaffold the Blazor Glassmorphism UI components and CSS styling.
   * Rapidly write the C# unit tests for the multi-agent routing logic.
@@ -179,7 +196,7 @@ flowchart TD
     Rewrite --> Audit2[Save to AuditLog]
     Audit2 --> UserChoice{User Accepts?}
     UserChoice -->|Yes| Publish
-    UserChoice -->|No| Start
+    UserChoice -->|No| Rewrite
 
     Classifier -->|Severe| Governor[Governance Agent]
     Governor --> Block[🚫 POST BLOCKED]
@@ -194,8 +211,11 @@ flowchart TD
     style Block fill:#f8d7da,stroke:#dc3545,stroke-width:4px
 ```
 
-**Team**
-+ **Kavya Aakaveeti** — .NET Developer: architecture, Microsoft Foundry integration, and Azure OpenAI orchestration.
+---
+
+## 👩‍💻 The Team
+
+**Kavya Aakaveeti** — .NET architecture, Microsoft Foundry integration, Azure OpenAI orchestration, Blazor UI, and Azure deployment.
 
 ---
 
@@ -232,20 +252,9 @@ While MindShield acts as a personal safety net, its true value lies in Corporate
 
 ---
 
-## 🗺️ Future Roadmap
+## 🗺️ What's Next
 
-📍 **Phase 1: Point-of-Creation Integration (UX)**
-+ **Enterprise Browser Extension**: Packaging the .NET logic into a Chrome/Edge extension to evaluate text natively within linkedin.com or x.com text boxes.
-+ **Mobile Keyboard API**: Developing an iOS/Android custom keyboard extension to intercept and evaluate content before it is submitted to any social application.
-
-📍 **Phase 2: Enterprise Ecosystem Hooks (Extensibility)**
-+ **Instant Chat Integrations**: Adding dependency-injected services for Microsoft Teams Alerts and Slack Webhooks.
-+ **SMS Escalation**: Integrating Twilio SMS for immediate, high-priority SEC violation alerts (MNPI leaks).
-+ **Role-Based Routing**: Routing "Moderate" coaching moments to HR, while instantly escalating "Severe" data leaks directly to SecOps.
-
-📍 **Phase 3: Corporate RAG & Hyper-Personalization (AI)**
-+ **Custom "Reality Profiles"**: Utilizing Azure AI Search (RAG) to ingest specific corporate employee handbooks, PR guidelines, and SEC compliance rules.
-+ **Dynamic Agent Context**: Feeding localized RAG data directly into the Classifier Agent, replacing generalized LLM knowledge with company-specific enforcement.
+The immediate priorities post-hackathon are a **Chrome/Edge browser extension** to intercept drafts natively inside LinkedIn and X, and **Role-Based Routing** to send "Moderate" coaching moments to HR while escalating "Severe" data leaks directly to SecOps. Further out, we plan to integrate **Azure AI Search (RAG)** to ingest company-specific employee handbooks and SEC compliance rules, replacing generalized LLM knowledge with enterprise-specific enforcement.
 
 ---
 
@@ -294,6 +303,8 @@ MindShield is designed from the ground up with responsible AI at its core:
    dotnet run
    ```
 7. **View the app** at the URL printed by the host (typically `https://localhost:5xxx`).
+
+**Demo Access Code:** `MindShield2025`
 
 ---
 
