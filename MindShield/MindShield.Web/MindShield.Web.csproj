@@ -25,4 +25,6 @@
     <UserSecretsId>8587a08e-0e3b-4ebc-8dfc-82a848410929</UserSecretsId>
   </PropertyGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
 </Project>
