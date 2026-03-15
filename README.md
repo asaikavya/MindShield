@@ -313,7 +313,7 @@ MindShield is designed from the ground up with responsible AI at its core:
    ```
 7. **View the app** at the URL printed by the host (typically `https://localhost:5xxx`).
 
-**Demo Access Code:** `MindShield2025`
+**Demo Access Code:** `MindShield2026`
 
 ---
 
