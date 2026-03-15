@@ -10,7 +10,7 @@
 | Resource | Link |
 | :--- | :--- |
 
-> **Demo Access Code:** `MindShield2025`
+> **Demo Access Code:** `MindShield2026`
 | **🚀 Azure Deployment** | [https://mindshield-app-czanc0d6gafuezcs.westus2-01.azurewebsites.net](https://mindshield-app-czanc0d6gafuezcs.westus2-01.azurewebsites.net) 
 | **🎥 Demo Video** | [Watch on YouTube](https://youtu.be/bhqjAB939LQ) |
 ---
