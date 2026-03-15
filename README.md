@@ -5,6 +5,15 @@
 **MindShield** is an AI-driven safety net for social media, built for the **Microsoft AI Dev Days Hackathon**. Powered by the **Microsoft Agent Framework**, **Microsoft Foundry**, and developed using **GitHub Copilot**.
 
 ---
+## 🌐 Live Demo
+
+| Resource | Link |
+| :--- | :--- |
+
+> **Demo Access Code:** `MindShield2025`
+| **🚀 Azure Deployment** | [https://mindshield-app-czanc0d6gafuezcs.westus2-01.azurewebsites.net](https://mindshield-app-czanc0d6gafuezcs.westus2-01.azurewebsites.net) 
+| **🎥 Demo Video** | [Watch on YouTube](https://youtu.be/bhqjAB939LQ) |
+---
 
 ## 💡 The Idea
 
