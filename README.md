@@ -316,6 +316,12 @@ MindShield is designed from the ground up with responsible AI at its core:
 
 ---
 
+⚠️ Disclaimer:
+
+MindShield is an independent hackathon project and is not affiliated with, endorsed by, or sponsored by LinkedIn, X (Twitter), Instagram, TikTok, or any other social media platform. All platform names are referenced solely for demonstrative and educational purposes to illustrate platform-context awareness in AI risk analysis.
+
+-----
+
 ## 🧠 A New Category of Technology
 
 > *"Just as developers run `git diff` before every commit — MindShield gives you that same pause, that same preview, before anything you post reaches the internet permanently."*
