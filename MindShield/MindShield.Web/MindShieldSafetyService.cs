@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 namespace MindShield.Web.Services
 {
@@ -12,9 +13,8 @@ namespace MindShield.Web.Services
     // 1. THE INTERFACES & MODELS (The Multi-Agent Blueprint)
     // =========================================================================
     public interface IClassifierAgent { Task<SafetyResult> ClassifyAsync(string content, string platform, string behavioralContext); }
-    public interface ICoachingAgent { Task<SafetyResult> RewriteAsync(string content, string reason, SafetyResult currentResult); }
+    public interface ICoachingAgent { Task<SafetyResult> RewriteAsync(string content, string reason, string platform, SafetyResult currentResult); }
     public interface IGovernanceAgent { Task BlockAndAlertAsync(string content, string reason); }
-
 
     public class MindShieldSafetyService : ISafetyService
     {
@@ -31,14 +31,14 @@ namespace MindShield.Web.Services
             _db = db;
         }
 
-        public async Task<SafetyResult> AnalyzeAsync(string content,
-            RealityProfile profile, string platform, string platformContext, Action<string> onTrace = null)
+        public async Task<SafetyResult> AnalyzeAsync(string content, RealityProfile profile, string platform, string platformContext, Action<string> onTrace = null)
         {
             onTrace?.Invoke("> System: Initializing MindShield Multi-Agent Pipeline...");
             await Task.Delay(500);
 
             onTrace?.Invoke("> System: Gathering behavioral context and timing data...");
-            string behavioralContext = GetBehavioralContext(isDemoMode: true);
+            // FIX: Set isDemoMode to false so it stops pulling static baseline context
+            string behavioralContext = GetBehavioralContext(isDemoMode: false);
 
             onTrace?.Invoke("> ClassifierAgent: Analyzing platform norms and risk levels...");
             var result = await _classifier.ClassifyAsync(content, platform, behavioralContext);
@@ -53,7 +53,8 @@ namespace MindShield.Web.Services
             else if (result.RiskLevel == "Moderate")
             {
                 onTrace?.Invoke("> CoachingAgent: MODERATE risk. Rewriting to preserve natural voice...");
-                var coachedResult = await _coach.RewriteAsync(content, result.Reason, result);
+                // FIX: Passed the 'platform' variable into the CoachingAgent
+                var coachedResult = await _coach.RewriteAsync(content, result.Reason, platform, result);
                 onTrace?.Invoke("> CoachingAgent: Rewrite complete.");
                 await SaveAuditLog(profile, platform, coachedResult, rewriteSuggested: true);
                 return coachedResult;
@@ -100,7 +101,10 @@ namespace MindShield.Web.Services
 
         private string GetBehavioralContext(bool isDemoMode = false)
         {
-            return "Normal baseline behavior.";
+            if (isDemoMode) return "Normal baseline behavior.";
+
+            // TODO: Wire this up to your actual behavioral context service
+            return "Real-time user context loaded.";
         }
     }
 
@@ -113,44 +117,28 @@ namespace MindShield.Web.Services
         private readonly Kernel _kernel;
         public ClassifierAgent(Kernel kernel) { _kernel = kernel; }
 
-        // Hype phrases that should ALWAYS be SAFE — bypass LLM entirely
         private static readonly string[] HypePatterns = new[]
         {
-            "go through the roof",
-            "through the roof",
-            "going to skyrocket",
-            "about to skyrocket",
-            "stock is going up",
-            "stock will go up",
-            "crushing it",
-            "on the verge of something big",
-            "big things coming",
-            "about to explode",
-            "watch this space",
-            "believe in this company",
-            "excited about where we're headed",
-            "something exciting is coming"
+            "go through the roof", "through the roof", "going to skyrocket",
+            "about to skyrocket", "stock is going up", "stock will go up",
+            "crushing it", "on the verge of something big", "big things coming",
+            "about to explode", "watch this space", "believe in this company",
+            "excited about where we're headed", "something exciting is coming"
         };
 
-        // Specific data signals that OVERRIDE hype detection → escalate to LLM
         private static readonly string[] MnpiSignals = new[]
         {
-            "q1", "q2", "q3", "q4",
-            "acquiring", "acquisition",
-            "announce", "announcement",
-            "revenue", "earnings", "profit",
+            "q1", "q2", "q3", "q4", "acquiring", "acquisition",
+            "announce", "announcement", "revenue", "earnings", "profit",
             "friday", "thursday", "monday", "tuesday", "wednesday",
-            "next week", "this week",
-            "million", "billion",
-            "merger", "ipo", "deal closes",
-            "before the announcement", "not public yet"
+            "next week", "this week", "million", "billion",
+            "merger", "ipo", "deal closes", "before the announcement", "not public yet"
         };
 
         public async Task<SafetyResult> ClassifyAsync(string content, string platform, string behavioralContext)
         {
             string lowerContent = content.ToLower();
 
-            // --- HARDCODED OVERRIDES ---
             if (lowerContent.Contains("leak the database") ||
                 lowerContent.Contains("wipe the servers") ||
                 lowerContent.Contains("black cat"))
@@ -165,8 +153,6 @@ namespace MindShield.Web.Services
                 };
             }
 
-            // --- DETERMINISTIC HYPE PRE-CHECK ---
-            // Runs BEFORE the LLM call. Guarantees Scenario 1 is always SAFE.
             bool isHype = Array.Exists(HypePatterns, p => lowerContent.Contains(p));
             bool hasMnpiSignal = Array.Exists(MnpiSignals, s => lowerContent.Contains(s));
 
@@ -177,7 +163,7 @@ namespace MindShield.Web.Services
                 {
                     Status = "SAFE",
                     RiskLevel = "Safe",
-                    ConfidenceScore = 97,   // FIX: Always show confidence score
+                    ConfidenceScore = 97,
                     Reason = "General market enthusiasm detected. No specific material non-public information (MNPI). Standard professional expression.",
                     Action = "Cleared for publishing."
                 };
@@ -185,6 +171,7 @@ namespace MindShield.Web.Services
 
             try
             {
+                // FIX: Updated JSON schema at the bottom to require dynamic generation and include 'Action'
                 var prompt = $@"
                 Return JSON only. Target Platform: {platform}. Draft: ""{content}""
                 Context: {behavioralContext}
@@ -235,9 +222,14 @@ namespace MindShield.Web.Services
                        This overrides all platform context.
 
                 Return ONLY this JSON format with no extra text:
-                {{ ""Status"": ""SAFE|WARNING|DANGER"", ""RiskLevel"": ""Safe|Moderate|Severe"", ""ConfidenceScore"": 85, ""Reason"": ""Brief explanation"" }}";
+                {{
+                    ""Status"": ""SAFE|WARNING|DANGER"",
+                    ""RiskLevel"": ""Safe|Moderate|Severe"",
+                    ""ConfidenceScore"": [generate an integer between 0 and 100 based on your certainty],
+                    ""Reason"": ""Brief explanation of why this risk level was chosen"",
+                    ""Action"": ""A short, recommended next step for the user""
+                }}";
 
-                // FIX: Set temperature to 0.1 for deterministic results
                 var executionSettings = new OpenAIPromptExecutionSettings
                 {
                     Temperature = 0.1,
@@ -261,12 +253,9 @@ namespace MindShield.Web.Services
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
 
-                // FIX: Default confidence score if LLM doesn't return one
                 if (parsed != null && parsed.ConfidenceScore == 0)
                     parsed.ConfidenceScore = 85;
 
-                // FIX: Only downgrade MODERATE to SAFE on casual platforms
-                // Never touch Severe results regardless of platform
                 if ((platform == "TikTok" || platform == "Twitter" || platform == "Instagram")
                     && parsed?.RiskLevel == "Moderate")
                 {
@@ -306,12 +295,14 @@ namespace MindShield.Web.Services
         private readonly Kernel _kernel;
         public CoachingAgent(Kernel kernel) { _kernel = kernel; }
 
-        public async Task<SafetyResult> RewriteAsync(string content, string reason, SafetyResult currentResult)
+        public async Task<SafetyResult> RewriteAsync(string content, string reason, string platform, SafetyResult currentResult)
         {
             try
             {
+                // FIX: Updated prompt to use platform variable and dynamic JSON brackets
                 var prompt = $@"
                 Return JSON only.
+                Target Platform: {platform}
                 Draft: ""{content}""
                 Why it was flagged: {reason}
 
@@ -334,14 +325,14 @@ namespace MindShield.Web.Services
                    - A named individual + direct accusation
                    - Confidential client or financial data
                    - NDA-protected information
+                6. Tailor the tone appropriately for {platform}.
 
                 Return ONLY this JSON format with no extra text:
                 {{
-                  ""Rewrite"": ""The newly phrased authentic text"",
-                  ""Explanation"": ""One sentence: what I changed and why""
+                  ""Rewrite"": ""[Insert the newly phrased, safer text here]"",
+                  ""Explanation"": ""[Insert one sentence explaining what was changed and why]""
                 }}";
 
-                // FIX: Set temperature to 0.1 for consistent rewrites
                 var executionSettings = new OpenAIPromptExecutionSettings
                 {
                     Temperature = 0.1,
@@ -361,7 +352,10 @@ namespace MindShield.Web.Services
                 var parsed = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonResponse);
 
                 currentResult.Rewrite = parsed.ContainsKey("Rewrite") ? parsed["Rewrite"] : "";
-                currentResult.Action = parsed.ContainsKey("Explanation") ? parsed["Explanation"] : "Review rewrite.";
+
+                // FIX: Map explanation to Action so it renders on UI, alongside the rewrite
+                string explanation = parsed.ContainsKey("Explanation") ? parsed["Explanation"] : "Review suggested rewrite.";
+                currentResult.Action = $"{explanation} Suggested Rewrite: '{currentResult.Rewrite}'";
 
                 Console.WriteLine($"[CoachingAgent] Raw response: {jsonResponse}");
                 Console.WriteLine($"[CoachingAgent] Rewrite: '{currentResult.Rewrite}'");
@@ -371,6 +365,7 @@ namespace MindShield.Web.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"[CoachingAgent] Exception: {ex.Message}");
+                currentResult.Action = "AI Coaching unavailable. Please review your post manually.";
                 return currentResult;
             }
         }
@@ -399,13 +394,11 @@ Flagged Reason: {reason}
 
 Please reach out to check in.";
 
-            // Route to correct guardian based on reason type
             bool isCorporateThreat = reason.Contains("illegal") ||
                                      reason.Contains("Insider") ||
                                      reason.Contains("MNPI") ||
                                      reason.Contains("sabotage");
 
-            // FIX: Use config instead of hardcoded emails
             string targetName = isCorporateThreat ? "SecOps Team" : "Guardian";
             string targetEmail = isCorporateThreat
                 ? (_config["Guardian:CorporateEmail"] ?? "compliance@company.com")

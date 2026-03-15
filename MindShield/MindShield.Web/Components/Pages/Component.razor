@@ -348,6 +348,11 @@ else
                 </div>
             }
         </div>
+        @* ===== DISCLAIMER ===== *@
+        <p style="margin-top: 20px; font-size: 0.75rem; color: rgba(255,255,255,0.3); text-align: center; line-height: 1.5;">
+            Platform names shown in the demo are for illustrative purposes only.<br />
+            MindShield is an independent prototype and not affiliated with any social media company.
+        </p>
     </div>
 
     @* ===== 5-SECOND COUNTDOWN MODAL ===== *@
@@ -389,7 +394,7 @@ else
     // =========================================================================
     // ACCESS GATE
     // =========================================================================
-    private const string DemoAccessCode = "MindShield2025";
+    private const string DemoAccessCode = "MindShield2026";
     private bool isAccessGranted = false;
     private string accessCodeInput = "";
     private bool showAccessError = false;
@@ -511,6 +516,7 @@ else
     private void SetPlatform(string platform)
     {
         selectedPlatform = platform;
+        postContent = "";
         safetyResult = null;
         canPost = false;
         alertClass = "";
@@ -649,7 +655,7 @@ else
 
         while (countdownTicks > 0 && !countdownCancelled)
         {
-            await Task.Delay(1000);
+            await Task.Delay(800);
 
             if (countdownCancelled) break;  // FIX: Check AFTER delay, not just in while condition
 
@@ -661,9 +667,13 @@ else
         if (!countdownCancelled && countdownTicks == 0)
         {
             showCountdownModal = false;
+            AddTraceLog("> GovernanceAgent: Countdown complete. Sending guardian alert...");
+            StateHasChanged();
             await Governor.BlockAndAlertAsync(postContent, safetyResult?.Reason ?? "Severe Risk Detected");
-            safetyResult = null;
+            AddTraceLog("> GovernanceAgent: ✅ Alert sent to guardian/compliance contact.");
+            //safetyResult = null;
             showGuardianPopup = true;
+            postContent = "";
             StateHasChanged();
 
             await Task.Delay(4000);
@@ -677,9 +687,10 @@ else
         countdownCancelled = true;      // FIX: Set flag first
         showCountdownModal = false;     // Then hide modal
         postContent = "";
-        safetyResult = null;
-        alertClass = "";
-        AgentTraceLogs.Clear();
+        //safetyResult = null;
+        //alertClass = "";
+        //AgentTraceLogs.Clear();
+        AddTraceLog("> GovernanceAgent: ⚠️ User cancelled. Post blocked locally.");
         StateHasChanged();
     }
 
