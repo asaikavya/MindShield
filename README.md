@@ -9,9 +9,6 @@
 
 | Resource | Link |
 | :--- | :--- |
-🌐 Project Links:
-
-Live Azure Deployment: https://mindshield-app-czanc0d6gafuezcs.westus2-01.azurewebsites.net (Demo Code: MindShield2026)
 | **🎥 Demo Video** | [Watch on YouTube](https://youtu.be/bhqjAB939LQ) |
 ---
 
